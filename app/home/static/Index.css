@@ -1,0 +1,32 @@
+body            {font-family: serif; background-color: #ffffff;}
+li				{margin: 0 0 3px 0;}
+
+.flash          {background: #F2F2F2;}
+.header         {left: 50%; text-align: center; font-family: 'Georgia', serif;
+				 border-bottom: 2px solid #eee; margin: 0;}
+.list    		{border: 2px solid; border-radius: 5px; padding: 5px; 
+				 margin: 5px; border-color: #262626;
+				 background-color: #737373; color: #e6e6e6;}
+
+.crud           {color: #c299ff;}
+.read           {color: #c299ff;}
+.add            {color: #c299ff;}
+.edit           {color: #ff3c00;}
+.delete         {color: #ffcc99;}
+
+.gSignIn		{border: 5px solid; padding: 5px; 
+				 margin: 5px; border-color: #ff0000; background-color: #ffffff;}
+.signOut		{border: 2px solid; border-radius: 5px; padding: 5px; 
+				 margin: 5px; border-color: #262626;
+				 background-color: #ffffff; width: 70px;}
+
+.hiddenClass	{display: none;}
+.hideLoggedIn	{}
+.hideLoggedOut	{}
+				 
+#signIn			{border: 2px solid; border-radius: 5px; padding: 5px; 
+				 margin: 5px; border-color: #262626; position: absolute;
+				 background-color: #000000;}
+#signInMessage	{color: #ffffff;}
+#title			{color: #8000ff; font-family: 'Impact', sans-serif; 
+				 font-style: italic;}

@@ -1,0 +1,12 @@
+{
+  "Users": [
+    {
+      "email": "example@google.com",
+      "username": "First User",
+      "id": 1,
+      "user_type": 1,
+      "google_id": 1,
+      "exp_cal_day": 2000
+    }
+  ]
+}
