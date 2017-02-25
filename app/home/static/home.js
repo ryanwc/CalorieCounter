@@ -11,22 +11,11 @@ var ccapp = angular.module("ccapp", []);
         $interpolateProvider.endSymbol('//');
     });
 
-    ccapp.controller("homeCtrl", function($scope) {
-        $scope.firstName = "ryan";
-    });
-    console.log(ccapp);
-
-    /*
     ccapp.controller("homeCtrl", function($scope, $http) {
 
-        $scopr.name = 'Ryan Connor';
+        $scope.firstName = "ryan";
 
-        $scope.signout = function($event) {
-
-        }
-        
-        $scope.signin = function($event) {
-            $event.preventDefault();
+        $scope.signin = function() {
             console.log("trying ajax");
             $http({
                 method:'POST',
@@ -42,6 +31,17 @@ var ccapp = angular.module("ccapp", []);
                 console.log(error);
             });
         };
+    });
+    console.log(ccapp);
+
+    /*
+    ccapp.controller("homeCtrl", function($scope, $http) {
+
+        $scopr.name = 'Ryan Connor';
+
+        $scope.signout = function($event) {
+
+        }
     });*/
 
     console.log("init");

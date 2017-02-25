@@ -1,6 +1,6 @@
 from flask import Flask, Blueprint, request, jsonify
 from flask_restful import Resource, Api
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from app import DataManager, ccapp
 
 api_bp = Blueprint('api', __name__)
@@ -34,12 +34,15 @@ def calorie_json(calorie_id):
 
     #return jsonify(Data=data.serialize)
 
-@ccapp.route('/signin/', methods=['POST'])
+@ccapp.route('/signin', methods=['POST'])
 def signin():
     """Endpoint for signing in to Calorie Counter app.
     """
     data = request.json
-    return jsonify({'username':content['username'],'password':content['password']})
+    print "hi" 
+    return jsonify({'username':data['username'],
+                    'password':data['password'], 
+                    'Access-Control-Allow-Origin': '*'})
 
 @ccapp.route('/signout/', methods=['POST'])
 def signout():
