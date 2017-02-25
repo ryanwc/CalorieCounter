@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+	{{ super() }}
+	<!--<meta name="google-site-verification" content="NTP3s5vk3p_XegMamJvIj1Bl0CGfOlZd0iZqr5_0wEE" />-->
+	<title>Calorie Counter - Record and analyze how many calories you consume each day</title>
+	<link rel=stylesheet type=text/css href="{{url_for('home.static',filename='home.css')}}">
+	<!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
+	</script>
+	<script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
+	<!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.2/angular.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.2/angular-route.js"></script>
+    <script src="{{url_for('home.static', filename='home.js')}}"></script>
+
+{% endblock %}
+
+{% block pageContent %}
+
+	<div ng-app="ccapp" ng-controller="homeCtrl">
+		<h1 class='header'>
+			Welcome to <span id='title'>Calorie Count</span>
+		</h1>
+
+		<div class='flash'>
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+				<ul>
+					{% for message in messages %}
+						<li><strong><{{message}}</strong></li>
+					{% endfor %}
+				</ul>
+			{% endif %}
+		{% endwith %}
+		</div>
+
+		<div class='list signedIn-//isSignedIn//' ng-show="isSignedIn()">
+			<h1>Hello //username//!</h1>
+			<p>What would you like to do?</p>
+			<ul>
+				<li>
+					<a class='crud read' href="">View your calories</a>
+				</li>
+				<li>
+					<a class='crud add' href="">Add some calories</a>
+				</li>
+			</ul>
+		</div>
+
+	<!-- Google+ sign in button -->
+	<!-- data-scope is the data we want to have access to -->
+	<!-- data-redirect="postmessage" enables the one-time use code flow -->
+	<!-- data-accesstype="offline" lets the app access user data even when 
+		the user is offline -->
+	<!-- data-cookiepolicy determines scope of URIs that can acces the cookie -->
+	<!-- data-callback specifies a callback method 
+		(in this case when the user signs in and Google gives the one-time-use code
+		along with an access code) -->
+	<!-- data-approvalprompt="force" means user has to log in 
+		each time visit login page // useful for debugging, not so in production -->
+		<div id="signInDiv">
+			<div class='signedIn-//isSignedIn()//' ng-show="isSignedIn()">
+				<span id='signInMessage'>Signed in as </span>
+				<br>
+				<a class='acrud read edit delete' id='profileCRUD'
+	               href="">View/edit your profile</a>
+		    	<div class='signOut'>
+		    		<a class="backLink" href="#" ng-submit="signOut()">Sign out</a>
+		    	</div>
+			</div>
+			<div class='signedIn-//!isSignedIn()//' ng-show="!isSignedIn()" id='signInButton'>
+				<div class="g-signin"
+					data-scope="openid email"
+	            	data-redirecturi="postmessage"
+	            	data-clientid="446362929824-aoa0sov3apqfqin1njstj6hu078e49ap.apps.googleusercontent.com"
+	            	data-accesstype="offline"
+	            	data-cookiepolicy="single_host_origin"
+	            	data-callback="signInCallback"
+	            	data-approvalprompt="force">
+	    		</div>
+	    	</div>
+	    </div>
+
+	</div>
+	<!-- end ng-app and controller div -->
+
+{% endblock %}
+
+
+{% block scripts %}
+	
+	<!--
+	<script src="bower_components/jquery.js"></script>
+	<script src="bower_components/knockout.js"></script>		
+	<script src="js/app.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBz6Og92aUD75aW9vxng8igWUKrjCJXT-U&libraries=places&callback=initMap" async defer onerror="alertUserOfError('The Google Map failed to load, so you will not see locations of any gems.');"></script>
+	-->
+
+{% endblock %}

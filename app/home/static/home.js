@@ -5,6 +5,7 @@ var ccapp = angular.module("ccapp", []);
 (function(){
     "use strict";
 
+    console.log("init angular home controller");
     // make jinja2 play with angular
     ccapp.config(function($interpolateProvider) {
         $interpolateProvider.startSymbol('//');
@@ -13,7 +14,11 @@ var ccapp = angular.module("ccapp", []);
 
     ccapp.controller("homeCtrl", function($scope, $http) {
 
-        $scope.firstName = "ryan";
+        $scope.username = "";
+
+        $scope.isSignedIn = function() {
+            return $scope.username.length > 0;
+        };
 
         $scope.signin = function() {
             console.log("trying ajax");
@@ -31,20 +36,11 @@ var ccapp = angular.module("ccapp", []);
                 console.log(error);
             });
         };
-    });
-    console.log(ccapp);
-
-    /*
-    ccapp.controller("homeCtrl", function($scope, $http) {
-
-        $scopr.name = 'Ryan Connor';
 
         $scope.signout = function($event) {
 
         }
-    });*/
-
-    console.log("init");
+    });
 })(ccapp);
 
 /*

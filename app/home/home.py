@@ -34,6 +34,7 @@ def login_required(function):
 @ccapp.route('/')
 @ccapp.route('/index/')
 @ccapp.route('/login/')
+@ccapp.route('/home/')
 def calorie_counter_home():
     """Serve the Calorie Counter homepage
     """
@@ -49,7 +50,7 @@ def calorie_counter_home():
     # for writing all existing db data to .json
     #writeTablesToJSON('initial_data/')
 
-    return render_template("index.html", state=state, 
+    return render_template("home.html", state=state, 
                            client_login_session=client_login_session)
 
 

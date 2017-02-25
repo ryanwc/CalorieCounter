@@ -21,8 +21,8 @@ li				{margin: 0 0 3px 0;}
 				 background-color: #ffffff; width: 70px;}
 
 .hiddenClass	{display: none;}
-.hideLoggedIn	{}
-.hideLoggedOut	{}
+.signedIn-true	{}
+.signedIn-false	{}
 				 
 #signIn			{border: 2px solid; border-radius: 5px; padding: 5px; 
 				 margin: 5px; border-color: #262626; position: absolute;

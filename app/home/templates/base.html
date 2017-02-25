@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+
+		{% block head %}
+
+		<!-- ensure any CSS media queries match the dimensions of the actual device, not the "zoomed out" device as the device zooms out to try and show everything at once -->
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+		{% endblock %}
+	</head>
+
+	<body>
+
+		<!-- start block for main page content -->
+		{% block pageContent %}
+
+		{% endblock %}
+		<!-- end block for main page content -->
+
+		<!-- start footer -->
+		{% block footer %}
+
+		<div class="outerdiv" id="navigationlinksdiv">
+
+			<p>
+				Created by <a href="https://github.com/ryanwc">Ryan William Connor</a> in February 2017.
+				<br>
+				Copyright © 2017 Ryan William Connor. All rights reserved.
+			</p>
+
+		</div>
+
+		{% endblock %}
+		<!-- end footer -->
+
+		{% block scripts %}
+
+		{% endblock %}
+
+	</body>
+</html>
