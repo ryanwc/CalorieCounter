@@ -1,4 +1,4 @@
-<html ng-app="ccapp">
+<html ng-app="ccapp" ng-controller="homeCtrl">
 <head>
 	<link rel=stylesheet type=text/css href="{{url_for('home.static',filename='index.css')}}">
 	<!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
@@ -7,14 +7,8 @@
 	<script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
 	<!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.2/angular.min.js"></script>
-	<script>
-		// make jinja2 play with angular
-		var ccappInterpolation = angular.module('ccapp', []);
-		ccappInterpolation.config(function($interpolateProvider) {
-			$interpolateProvider.startSymbol('//');
-			$interpolateProvider.endSymbol('//');
-		});
-    </script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.2/angular-route.js"></script>
+    <script src="{{url_for('home.static', filename='home.js')}}"></script>
 </head>
 <body>
 	<h1 class='header'>
@@ -34,9 +28,13 @@
 	</div>
 
 	<div name="angulartest">
-		<input type="text" ng-model="yourName" placeholder="Enter a name here">
-		<hr>
-		<h1>Hello //yourName//!</h1>
+		<h1>Hello //userName//!</h1>
+		<div>
+    		<input type="text" ng-model="firstName" placeholder="Username">
+    		<p ng-model="name"></p>
+    		<input type="password" placeholder="Password">
+    		<input type="button" ng-submit="signin()" value="SignIn"> 
+		</div>
 	</div>
 
 	<div class='list'>
@@ -81,7 +79,7 @@
     		</div>
     	</div>
     	<div class='hideLoggedOut signOut'>
-    		<a class="backLink" href="#" onclick="signOut();">Sign out</a>
+    		<a class="backLink" href="#" ng-submit="HomeCtrl.signOut();">Sign out</a>
     	</div>
     </div>
     <br>
@@ -93,9 +91,10 @@
     </div>
 	<div class='hiddenClass' id='state'><!--state}}--></div>
 	
-<script src="hello"></script> <!--"url_for('static', filename='login.js')}}" for left func -->
+<script src=""></script> <!--"url_for('static', filename='login.js')}}" for left func -->
+<!--
 <script>
 	displayBasedOnLogin("hi"); 
-</script><!--"client_login_session['message']}}" for above func-->
+</script>"client_login_session['message']}}" for above func-->
 </body>
 </html>
