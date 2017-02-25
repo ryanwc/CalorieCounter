@@ -1,7 +1,7 @@
-import sys
+import sys, psycopg2
 
-from sqlalchemy import (Table, Column, ForeignKey, Integer, String,
-                        CheckConstraint, create_engine)
+from sqlalchemy import (Table, Column, ForeignKey, Integer, String, Date,
+                        CheckConstraint, create_engine, Boolean, Time)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -9,6 +9,11 @@ from sqlalchemy.orm import relationship
 # create an object to hold the database's data
 Base = declarative_base()
 
+'''
+Table('sometable', metadata,
+        Column('id', Integer, Sequence('some_id_seq'), primary_key=True)
+    )
+'''
 
 # define tables
 class UserType(Base):
@@ -17,23 +22,21 @@ class UserType(Base):
     """
     __tablename__ = 'user_type'
 
-    '''
-	id = Column(Integer, primary_key=True)
-	name = Column(String(30), nullable=False, unique=True)
-	CRUD_self = Column(Boolean, nullable=False)
-	CRUD_users = Column(Boolean, nullable=False)
-	CRUD_all = Column(Boolean, nullable=False)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(30), nullable=False, unique=True)
+    CRUD_self = Column(Boolean, nullable=False)
+    CRUD_users = Column(Boolean, nullable=False)
+    CRUD_all = Column(Boolean, nullable=False)
 
-	@property
-	def serialize(self):
+    @property
+    def serialize(self):
                 return {
                         'id': self.id,
                         'name': self.name,
                         'CRUD_self': self.CRUD_self,
-	                    'CRUD_users': self.CRUD_users,
-	                    'CRUD_all': self.CRUD_all,
+                        'CRUD_users': self.CRUD_users,
+                        'CRUD_all': self.CRUD_all,
                 }
-    '''
 
 
 class User(Base):
@@ -41,15 +44,14 @@ class User(Base):
     """
     __tablename__ = 'user'
 
-    '''
     id = Column(Integer, primary_key=True)
     username = Column(String(30), nullable=False)
     google_id = Column(Integer, unique=True, nullable=False)
     email = Column(String(30), unique=True, nullable=False)
     exp_cal_day = Column(Integer, nullable=False)
-    user_type = Column(Integer, ForeignKey('user_type.id')
+    user_type = Column(Integer, ForeignKey('user_type.id'))
 
-    type = relationship(UserType)
+    user_type = relationship(UserType)
 
     CheckConstraint('exp_cal_day >= 0')
 
@@ -63,7 +65,6 @@ class User(Base):
                         'exp_cal_day': self.exp_cal_day,
                         'user_type': self.user_type,
                 }
-    '''
 
 
 class Calorie(Base):
@@ -71,20 +72,19 @@ class Calorie(Base):
     """
     __tablename__ = 'calorie'
 
-    '''
-	id = Column(Integer, primary_key=True)
-	user_id = Column(Integer, ForeignKey('user.id'))
-	date = Column(Date, nullable=False)
-	time = Column(Time, nullable=False)
-	text = Column(String(200), nullable=False)
-	num_calories = Column(Integer, nullable=False)
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    date = Column(Date, nullable=False)
+    time = Column(Time, nullable=False)
+    text = Column(String(200), nullable=False)
+    num_calories = Column(Integer, nullable=False)
 
     user = relationship(User)
 
     CheckConstraint('num_calories > 0')
 
-	@property
-	def serialize(self):
+    @property
+    def serialize(self):
                 return {
                         'id': self.id,
                         'user_id': self.user_id,
@@ -93,10 +93,9 @@ class Calorie(Base):
                         'text': self.text,
                         'num_calories': self.num_calories,
                 }
-    '''
 
 # connect to database engine
-engine = create_engine('postgresql:///caloriecounter.db')
+engine = create_engine('postgresql+psycopg2://localhost/caloriecounter')
 
 # creates the database as new tables with the given engine/name
 Base.metadata.create_all(engine)

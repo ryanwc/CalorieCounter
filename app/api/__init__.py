@@ -1,3 +1,3 @@
 from flask import Flask
 
-app = Flask(__name__)
+ccapp = Flask(__name__)

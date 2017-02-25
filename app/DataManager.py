@@ -3,13 +3,13 @@ from sqlalchemy.orm import sessionmaker
 
 from database_setup import (Base, User, UserType, Calorie)
 
-from . import app
+import psycopg2 
 
 
 def get_calorie_db_session():
     """Return an interactive session with the Calorie Count database.
     """
-    engine = create_engine('postgresql:///caloriecount.db')
+    engine = create_engine('postgresql+psycopg2://localhost/caloriecounter')
     Base.metadata.bind = engine
     db_session = sessionmaker(bind=engine)
     session = db_session()
@@ -256,7 +256,7 @@ def add_rows_from_json(json_rows, table_constructor):
 def drop_all_records():
     """Drop all records from the Calorie Count database
     """
-    engine = create_engine('postgresql:///caloriecount.db')
+    engine = create_engine('postgresql+psycopg2://localhost/caloriecounter')
     Base.metadata.bind = engine
 
     Base.metadata.drop_all(engine)

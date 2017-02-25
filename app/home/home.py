@@ -6,9 +6,9 @@ from oauth2client.client import FlowExchangeError
 
 import json, httplib2, requests, traceback, random, string
 
-import app.DataManager, app
-from app.utils import (get_client_login_session, set_session_user_info,
-                       get_signin_alert, is_logged_in)
+from app import DataManager, ccapp
+from app.utils import (get_client_login_session, 
+    set_session_user_info, get_signin_alert, is_logged_in)
 
 
 home_bp = Blueprint('home', __name__, 
@@ -31,9 +31,9 @@ def login_required(function):
 # Homepage view
 
 
-@app.route('/')
-@app.route('/index/')
-@app.route('/login/')
+@ccapp.route('/')
+@ccapp.route('/index/')
+@ccapp.route('/login/')
 def calorie_counter_home():
     """Serve the Calorie Counter homepage
     """
@@ -56,7 +56,7 @@ def calorie_counter_home():
 # Login/logout endpoints
 
 
-@app.route('/gconnect', methods=['POST'])
+@ccapp.route('/gconnect', methods=['POST'])
 def gconnect():
     """Ajax endpoint for google sign in authentication
     """
@@ -143,7 +143,7 @@ def gconnect():
     return get_signin_alert()
 
 
-@app.route('/disconnect', methods=['POST'])
+@ccapp.route('/disconnect', methods=['POST'])
 def disconnect():
     """Logout a user that is currently logged in.
     Returns immediately if no user is logged in.
@@ -189,7 +189,7 @@ def disconnect():
     return logout_message
 
 
-@app.route('/gdisconnect', methods=['POST'])
+@ccapp.route('/gdisconnect', methods=['POST'])
 def gdisconnect():
     """Disconnect a user from Google OAuth.
     """

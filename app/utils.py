@@ -2,7 +2,7 @@ from flask import flash, session as login_session
 
 from api.api import user_type_json, user_json, calorie_json
 
-from . import app, DataManager
+from . import ccapp, DataManager
 
 import bleach, json, re
 
