@@ -1,11 +1,20 @@
-<html>
+<html ng-app="ccapp">
 <head>
-	<link rel=stylesheet type=text/css href=""><!--"url_for('home.static',filename='index.css')}}"-->
+	<link rel=stylesheet type=text/css href="{{url_for('home.static',filename='index.css')}}">
 	<!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
 	</script>
 	<script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
 	<!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.2/angular.min.js"></script>
+	<script>
+		// make jinja2 play with angular
+		var ccappInterpolation = angular.module('ccapp', []);
+		ccappInterpolation.config(function($interpolateProvider) {
+			$interpolateProvider.startSymbol('//');
+			$interpolateProvider.endSymbol('//');
+		});
+    </script>
 </head>
 <body>
 	<h1 class='header'>
@@ -17,11 +26,17 @@
 		{% if messages %}
 			<ul>
 				{% for message in messages %}
-					<li><strong><!--message}}--></strong></li>
+					<li><strong><{{message}}</strong></li>
 				{% endfor %}
 			</ul>
 		{% endif %}
 	{% endwith %}
+	</div>
+
+	<div name="angulartest">
+		<input type="text" ng-model="yourName" placeholder="Enter a name here">
+		<hr>
+		<h1>Hello //yourName//!</h1>
 	</div>
 
 	<div class='list'>
