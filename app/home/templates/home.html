@@ -20,33 +20,37 @@
 {% block pageContent %}
 
 	<div ng-app="ccapp" ng-controller="homeCtrl">
-		<h1 class='header'>
-			Welcome to <span id='title'>Calorie Count</span>
-		</h1>
 
-		<div class='flash'>
-		{% with messages = get_flashed_messages() %}
-			{% if messages %}
-				<ul>
-					{% for message in messages %}
-						<li><strong><{{message}}</strong></li>
-					{% endfor %}
-				</ul>
-			{% endif %}
-		{% endwith %}
+		<div class="outerdiv" id="headerdiv">
+			<h1 id="headerlogo">Calorie Counter</h1>
+			<p id="headerlogophrase">Record and analyze how many calories you consume each day</p>
 		</div>
 
-		<div class='list signedIn-//isSignedIn//' ng-show="isSignedIn()">
-			<h1>Hello //username//!</h1>
-			<p>What would you like to do?</p>
-			<ul>
-				<li>
-					<a class='crud read' href="">View your calories</a>
-				</li>
-				<li>
-					<a class='crud add' href="">Add some calories</a>
-				</li>
-			</ul>
+		<div class="outerdiv" id="flashdiv">
+			{% with messages = get_flashed_messages() %}
+				{% if messages %}
+					<ul>
+						{% for message in messages %}
+							<li><strong><{{message}}</strong></li>
+						{% endfor %}
+					</ul>
+				{% endif %}
+			{% endwith %}
+		</div>
+
+		<div class="outerdiv" id="mainviewdiv">
+			<div class="list signedIn-//isSignedIn//" ng-show="isSignedIn()">
+				<h1>Hello //username//!</h1>
+				<p>What would you like to do?</p>
+				<ul>
+					<li>
+						<a class='crud read' href="">View your calories</a>
+					</li>
+					<li>
+						<a class='crud add' href="">Add some calories</a>
+					</li>
+				</ul>
+			</div>
 		</div>
 
 	<!-- Google+ sign in button -->
@@ -60,7 +64,7 @@
 		along with an access code) -->
 	<!-- data-approvalprompt="force" means user has to log in 
 		each time visit login page // useful for debugging, not so in production -->
-		<div id="signInDiv">
+		<div class="outerdiv" id="controlPanel">
 			<div class='signedIn-//isSignedIn()//' ng-show="isSignedIn()">
 				<span id='signInMessage'>Signed in as </span>
 				<br>
@@ -82,6 +86,7 @@
 	    		</div>
 	    	</div>
 	    </div>
+		</div>
 
 	</div>
 	<!-- end ng-app and controller div -->

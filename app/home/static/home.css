@@ -1,32 +1,424 @@
-body            {font-family: serif; background-color: #ffffff;}
-li				{margin: 0 0 3px 0;}
+/* classes */
+body {
+	font-family: serif; 
+	background-color: #cccccc;
+}
+li {
+	margin: 0 0 3px 0;
+}
 
-.flash          {background: #F2F2F2;}
-.header         {left: 50%; text-align: center; font-family: 'Georgia', serif;
-				 border-bottom: 2px solid #eee; margin: 0;}
-.list    		{border: 2px solid; border-radius: 5px; padding: 5px; 
-				 margin: 5px; border-color: #262626;
-				 background-color: #737373; color: #e6e6e6;}
+.outerdiv {
+	margin-right: 5px;
+	margin-left: 5px;
+}
 
-.crud           {color: #c299ff;}
-.read           {color: #c299ff;}
-.add            {color: #c299ff;}
-.edit           {color: #ff3c00;}
-.delete         {color: #ffcc99;}
+.crud {
+	color: #c299ff;
+}
+.read {
+	color: #c299ff;
+}
+.add {
+	color: #c299ff;
+}
+.edit {
+	color: #ff3c00;
+}
+.delete {
+	color: #ffcc99;
+}
 
-.gSignIn		{border: 5px solid; padding: 5px; 
-				 margin: 5px; border-color: #ff0000; background-color: #ffffff;}
-.signOut		{border: 2px solid; border-radius: 5px; padding: 5px; 
-				 margin: 5px; border-color: #262626;
-				 background-color: #ffffff; width: 70px;}
+.signedIn-true {
 
-.hiddenClass	{display: none;}
-.signedIn-true	{}
-.signedIn-false	{}
+}
+.signedIn-false{
+
+}
+
+.list {
+	border: 2px solid; 
+	border-radius: 5px; 
+	padding: 5px; 
+	margin: 5px;
+	border-color: #262626;
+	background-color: #737373;
+	color: #e6e6e6;
+}
+
+.gSignIn {
+	border: 5px solid; 
+	padding: 5px;
+	margin: 5px;
+	border-color: #ff0000;
+	background-color: #ffffff;
+}
+.signOut {
+	border: 2px solid;
+	border-radius: 5px;
+	padding: 5px;
+	margin: 5px;
+	border-color: #262626;
+	background-color: #ffffff;
+	width: 70px;
+}
+
+/* specific elements */
+#flash          {
+	background: #F2F2F2;
+}
+
+#headerdiv {
+	padding-left: 15px;
+	padding-right: 15px;
+	max-height: 500px;
+	max-width: 515px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 10px;
+	border-bottom: 1px solid black
+}
+#headerlogo {
+	text-align: center;
+	margin-bottom: 2px;
+	color: #8000ff;
+	font-family: 'Impact', sans-serif; 
+	font-style: italic;
+}
+#headerlogophrase {
+	text-align: center;
+	margin-top: 1px;
+	margin-bottom: 5px;
+	font-size: .85em;
+}
+
+#mainviewdiv {
+	left: 50%;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	max-height: 500px;
+	max-width: 515px;
+	margin-left: auto;
+	margin-right: auto;
+}
+#mainview {
+	height: 100%;
+	width: 100%;
+	max-height: 500px;
+	border: 1px solid black;
+}
 				 
-#signIn			{border: 2px solid; border-radius: 5px; padding: 5px; 
-				 margin: 5px; border-color: #262626; position: absolute;
-				 background-color: #000000;}
-#signInMessage	{color: #ffffff;}
-#title			{color: #8000ff; font-family: 'Impact', sans-serif; 
-				 font-style: italic;}
+#controlPanel	{
+	left: 50%;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	max-height: 500px;
+	max-width: 515px;
+	margin-left: auto;
+	margin-right: auto;
+	border: 1px solid;
+	border-radius: 5px;
+	border-color: #262626;
+	background-color: #8000ff;
+}
+#signInMessage {
+	color: #ffffff;
+}
+
+#footerdiv {
+	padding-left: 15px;
+	padding-right: 15px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 15px;
+	background-color: #f2f2f2;
+	padding: 5px;
+	border: 1px solid black;
+	border-radius: 8px;
+	font-size: .8em;
+	max-height: 200px;
+	max-width: 800px;
+}
+
+/*flexwrap list
+#listviewlist {
+	background-color: #cce6ff;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	height: 35px;
+	border: 1px solid black;
+	overflow-y: scroll;
+	display: flex;
+	flex-wrap: wrap;
+}*/
+
+/*
+#something {
+	background-color: #009900;
+	color: white;
+}
+
+#something:hover {
+	cursor: pointer;
+}*/
+
+/* circular loading gif
+*/
+
+#somethingloadinggif{
+	position:relative;
+	width:17px;
+	height:21px;
+	margin:auto;
+}
+
+.loadinggif{
+	position:absolute;
+	background-color:rgb(255,255,255);
+	width:3px;
+	height:7px;
+	border-radius:2px 2px 0 0;
+		-o-border-radius:2px 2px 0 0;
+		-ms-border-radius:2px 2px 0 0;
+		-webkit-border-radius:2px 2px 0 0;
+		-moz-border-radius:2px 2px 0 0;
+	transform:scale(0.4);
+		-o-transform:scale(0.4);
+		-ms-transform:scale(0.4);
+		-webkit-transform:scale(0.4);
+		-moz-transform:scale(0.4);
+	animation-name:fademaploadinggif;
+		-o-animation-name:fademaploadinggif;
+		-ms-animation-name:fademaploadinggif;
+		-webkit-animation-name:fademaploadinggif;
+		-moz-animation-name:fademaploadinggif;
+	animation-duration:1.2s;
+		-o-animation-duration:1.2s;
+		-ms-animation-duration:1.2s;
+		-webkit-animation-duration:1.2s;
+		-moz-animation-duration:1.2s;
+	animation-iteration-count:infinite;
+		-o-animation-iteration-count:infinite;
+		-ms-animation-iteration-count:infinite;
+		-webkit-animation-iteration-count:infinite;
+		-moz-animation-iteration-count:infinite;
+	animation-direction:normal;
+		-o-animation-direction:normal;
+		-ms-animation-direction:normal;
+		-webkit-animation-direction:normal;
+		-moz-animation-direction:normal;
+}
+
+#loadinggif_01{
+	left:0;
+	top:8px;
+	animation-delay:0.45s;
+		-o-animation-delay:0.45s;
+		-ms-animation-delay:0.45s;
+		-webkit-animation-delay:0.45s;
+		-moz-animation-delay:0.45s;
+	transform:rotate(-90deg);
+		-o-transform:rotate(-90deg);
+		-ms-transform:rotate(-90deg);
+		-webkit-transform:rotate(-90deg);
+		-moz-transform:rotate(-90deg);
+}
+
+#loadinggif_02{
+	left:2px;
+	top:3px;
+	animation-delay:0.6s;
+		-o-animation-delay:0.6s;
+		-ms-animation-delay:0.6s;
+		-webkit-animation-delay:0.6s;
+		-moz-animation-delay:0.6s;
+	transform:rotate(-45deg);
+		-o-transform:rotate(-45deg);
+		-ms-transform:rotate(-45deg);
+		-webkit-transform:rotate(-45deg);
+		-moz-transform:rotate(-45deg);
+}
+
+#loadinggif_03{
+	left:7px;
+	top:1px;
+	animation-delay:0.75s;
+		-o-animation-delay:0.75s;
+		-ms-animation-delay:0.75s;
+		-webkit-animation-delay:0.75s;
+		-moz-animation-delay:0.75s;
+	transform:rotate(0deg);
+		-o-transform:rotate(0deg);
+		-ms-transform:rotate(0deg);
+		-webkit-transform:rotate(0deg);
+		-moz-transform:rotate(0deg);
+}
+
+#loadinggif_04{
+	right:2px;
+	top:3px;
+	animation-delay:0.9s;
+		-o-animation-delay:0.9s;
+		-ms-animation-delay:0.9s;
+		-webkit-animation-delay:0.9s;
+		-moz-animation-delay:0.9s;
+	transform:rotate(45deg);
+		-o-transform:rotate(45deg);
+		-ms-transform:rotate(45deg);
+		-webkit-transform:rotate(45deg);
+		-moz-transform:rotate(45deg);
+}
+
+#loadinggif_05{
+	right:0;
+	top:8px;
+	animation-delay:1.05s;
+		-o-animation-delay:1.05s;
+		-ms-animation-delay:1.05s;
+		-webkit-animation-delay:1.05s;
+		-moz-animation-delay:1.05s;
+	transform:rotate(90deg);
+		-o-transform:rotate(90deg);
+		-ms-transform:rotate(90deg);
+		-webkit-transform:rotate(90deg);
+		-moz-transform:rotate(90deg);
+}
+
+#loadinggif_06{
+	right:2px;
+	bottom:2px;
+	animation-delay:1.2s;
+		-o-animation-delay:1.2s;
+		-ms-animation-delay:1.2s;
+		-webkit-animation-delay:1.2s;
+		-moz-animation-delay:1.2s;
+	transform:rotate(135deg);
+		-o-transform:rotate(135deg);
+		-ms-transform:rotate(135deg);
+		-webkit-transform:rotate(135deg);
+		-moz-transform:rotate(135deg);
+}
+
+#loadinggif_07{
+	bottom:0;
+	left:7px;
+	animation-delay:1.35s;
+		-o-animation-delay:1.35s;
+		-ms-animation-delay:1.35s;
+		-webkit-animation-delay:1.35s;
+		-moz-animation-delay:1.35s;
+	transform:rotate(180deg);
+		-o-transform:rotate(180deg);
+		-ms-transform:rotate(180deg);
+		-webkit-transform:rotate(180deg);
+		-moz-transform:rotate(180deg);
+}
+
+#loadinggif_08{
+	left:2px;
+	bottom:2px;
+	animation-delay:1.5s;
+		-o-animation-delay:1.5s;
+		-ms-animation-delay:1.5s;
+		-webkit-animation-delay:1.5s;
+		-moz-animation-delay:1.5s;
+	transform:rotate(-135deg);
+		-o-transform:rotate(-135deg);
+		-ms-transform:rotate(-135deg);
+		-webkit-transform:rotate(-135deg);
+		-moz-transform:rotate(-135deg);
+}
+
+
+@keyframes fadeloadinggif{
+	0%{
+		background-color:rgb(0,0,0);
+	}
+
+	100%{
+		background-color:rgb(255,255,255);
+	}
+}
+
+@-o-keyframes fadeloadinggif{
+	0%{
+		background-color:rgb(0,0,0);
+	}
+
+	100%{
+		background-color:rgb(255,255,255);
+	}
+}
+
+@-ms-keyframes fadeloadinggif{
+	0%{
+		background-color:rgb(0,0,0);
+	}
+
+	100%{
+		background-color:rgb(255,255,255);
+	}
+}
+
+@-webkit-keyframes fadeloadinggif{
+	0%{
+		background-color:rgb(0,0,0);
+	}
+
+	100%{
+		background-color:rgb(255,255,255);
+	}
+}
+
+@-moz-keyframes fadeloadinggif{
+	0%{
+		background-color:rgb(0,0,0);
+	}
+
+	100%{
+		background-color:rgb(255,255,255);
+	}
+}
+
+/* media queries
+*/
+
+/* #### Mobile Phones Portrait #### */
+@media screen and (max-device-width: 480px) and (orientation: portrait){
+
+}
+
+/* #### Mobile Phones Landscape #### */
+@media screen and (max-device-width: 640px) and (orientation: landscape){
+
+}
+
+/* #### Mobile Phones Portrait or Landscape #### */
+@media screen and (max-device-width: 640px){
+
+}
+
+/* #### iPhone 4+ Portrait or Landscape #### */
+@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2){
+
+}
+
+/* #### iPhone 5 Portrait or Landscape #### */
+@media (device-height: 568px) and (device-width: 320px) and (-webkit-min-device-pixel-ratio: 2){
+
+}
+
+/* #### iPhone 6 and 6 plus Portrait or Landscape #### */
+@media (min-device-height: 667px) and (min-device-width: 375px) and (-webkit-min-device-pixel-ratio: 3){
+
+}
+
+/* #### Tablets Portrait or Landscape #### */
+@media screen and (min-device-width: 768px) and (max-device-width: 1024px){
+
+}
