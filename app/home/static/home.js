@@ -16,6 +16,13 @@ var ccapp = angular.module("ccapp", []);
 
         $scope.username = "";
 
+        $scope.setUserInfo = function(data) {
+            $scope.user_id = data.data.user_id;
+            $scope.username = data.data.username;
+            $scope.user_type = data.data.user_type;
+            $scope.exp_cal = data.data.exp_cal;
+        };
+
         $scope.isSignedIn = function() {
             return $scope.username.length > 0;
         };
@@ -23,12 +30,12 @@ var ccapp = angular.module("ccapp", []);
         $scope.signin = function(authResult) {
             console.log("trying ajax from angular");
 
-            //loading graphic //$('#signIn').addClass('hiddenClass');
+            // TO-DO:loading graphic
 
             // make ajax call to server to connect with oauth and handle result
             $http({
-                method:'POST', // processData: false,
-                url: '/gconnect?state=' + angular.element("#state").html(), // 'http://127.0.0.1:5000/signin', 
+                method:'POST',
+                url: '/gconnect?state=' + angular.element("#state").html(),
                 headers: {
                    'Content-Type': 'application/json;charset=utf-8'
                 },
@@ -36,19 +43,12 @@ var ccapp = angular.module("ccapp", []);
             })
             .then(function(resp){
                 console.log(resp);
-                $scope.handleSignInResult(resp);
+                $scope.setUserInfo(resp);
             },function(error){
                 console.log(error);
                 console.log('There was an error: ' + authResult['error']);
             });
-
         };
-
-        // make ajax call to server to connect with oauth and handle result
-        $scope.handleSignInResult = function connect(urlWithState, data) {
-            resultObj = JSON.parse(result);      
-            // do stuff
-        }
 
         $scope.signout = function(forUserDeletion=0) {
             var xhttp = new XMLHttpRequest();
