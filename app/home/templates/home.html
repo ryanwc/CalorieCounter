@@ -37,19 +37,64 @@
 			{% endwith %}
 		</div>
 
-		<div class="outerdiv" id="mainviewdiv">
+		<div class="outerdiv" id="controldiv">
+
 			<div class="list signedIn-//isSignedIn//" ng-show="isSignedIn()">
-				<h1>Hello //username//!</h1>
-				<p>What would you like to do?</p>
-				<ul>
-					<li>
-						<a class='crud read' href="">View your calories</a>
-					</li>
-					<li>
-						<a class='crud add' href="">Add some calories</a>
-					</li>
-				</ul>
+				<h1>You are signed in as //username//.</h1>
+				<p>Options:</p>
+				<a href="toggleProfileView(true)" ng-show="canCRUDSelf()">View/edit your profile></a>
+				<br>
+				<a href="toggleCalorieView(true)" ng-show="canCRUDSelf()">View/edit/modify/delete your calories</a>
+				<br>
+				<a href="toggleUserView(true)" ng-show="canCRUDUsers()">Manage users <span ng-show="canCRUDAll()">and calorie records</span></a>
 			</div>
+
+		</div>
+
+		<div class="outerdiv" id="mainviewdiv">
+			<!-- extension: sub angular views in and out based on controldiv selections -->
+
+			<div id="caloriediv" ng-show="viewingCalories">
+
+				<div id="calorielistdiv" ng-repeat="cal in curr_cals">
+					<span id="calorielistheader">Click a calorie to view details.</span>
+					<div id="calorielistlist">
+				      	<a href="toggleViewCalorie(true)"><span>Date: //cal.date//</span>; Amount: //cal.amnt//</span></a>
+				      	<br>
+				      	<a href="toggleCaloriePost(true, true)">Add new calorie</a>
+				    </div>
+				</div>
+
+				<div id="singlecaloriediv" ng-show="viewingCalorie">
+			      	<span>Date: <span ng-model="curr_cal.date"></span></span>
+			      	<br>
+			      	<span>Time: <span ng-model="curr_cal.time"></span></span>
+			      	<br>
+			      	<span>Amount: <span ng-model="curr_cal.amnt"></span></span>
+			      	<br>
+			      	<span>Text: <span ng-model="curr_cal.text"></span></span>
+			      	<br>
+			      	<span><a href="toggleCaloriePost(true, false)">edit calorie</a> | <form ng-submit="deleteCalorie()"><input type="submit" value="delete calorie"></form> | <a href="toggleViewCalorie(false)">stop viewing calorie</a>
+			      </form>
+				</div>
+
+				<div id="postcaloriediv" ng-show="postingCalorie">
+					<form id="postcalorieform" ng-submit="postCalorie()">
+						<span class="calformheader" ng-show="addingCalorie">Add a calorie with the following info:</span>
+						<span class="calformheader" ng-show="editingCalorie">Change the calorie as desired and submit.</span>
+						<br>
+						<span class="attridentifier">Date: </span><input type="date" ng-model="postCalorieDate" ng-model="post_cal.date"> 
+						<span class="attridentifier">Time: </span><input type="time" ng-model="postCalorieTime" ng-model="post_cal.time">
+						<span class="attridentifier">Number of calories: </span><input type="text" ng-model="post_cal.amnt" ng-model="curr_cal_amnt">
+						<span class="attridentifier">Text: </span><input type="text" ng-model="postCalorieText" ng-model="post_cal.text">
+						<span class="attridentifier">Text: </span><input type="submit" value="submit">
+						<a href="toggleCaloriePost(false, addingCalorie)">cancel</a>
+					</form>
+				</div>
+
+			</div>
+			<!-- end calorie view -->
+
 		</div>
 
 	<!-- Google+ sign in button -->
@@ -63,7 +108,7 @@
 		along with an access code) -->
 	<!-- data-approvalprompt="force" means user has to log in 
 		each time visit login page // useful for debugging, not so in production -->
-		<div class="outerdiv" id="controlPanel">
+		<div class="outerdiv" id="signindiv">
 			<div class='signedIn-//isSignedIn()//' ng-show="isSignedIn()">
 				<span id='signInMessage'>Signed in as </span>
 				<br>
