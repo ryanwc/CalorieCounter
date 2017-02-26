@@ -16,7 +16,7 @@ CORS(ccapp)
 
 # data access endpoints
 
-@ccapp.route('/user_type/JSON/', methods=['GET'])
+@ccapp.route('/user_type/', methods=['GET'])
 def user_type_json():
     """JSON endpoint for serving user type data from the database.
     """
@@ -25,7 +25,7 @@ def user_type_json():
     #return jsonify(Data=[i.serialize for i in data])
 
 
-@ccapp.route('/user/<int:user_id>/JSON/', methods=['GET'])
+@ccapp.route('/user/id=<int:user_id>', methods=['GET'])
 def user_json(user_id):
     """JSON endpoint for serving user data from the database.
     """
@@ -33,14 +33,78 @@ def user_json(user_id):
 
     #return jsonify(Data=data.serialize)
 
-@ccapp.route('/calorie/<int:calorie_id>/JSON/', methods=['GET'])
-def calorie_json(calorie_id):
-    """JSON endpoint for serving calorie record data from the database.
+
+@ccapp.route('/calorie/id=<int:calorie_id>+user_id=<int:calorie_id>+date_from=<int:date_from>+date_to=<int:date_to>+time_from=<int:time_from>+time_to=<int:time_time>/', 
+        methods=['GET'])
+def get_calorie(calorie_id, user_id, date_from, date_to, time_from, time_to):
+    """Endpoint for serving calorie records from the database.
+
+    Args:
+        calorie_id: the id of the calorie to get
+        user_id: the user id of the calorie's owner
+        date_from: the beginning date of the range of calories to get
+        date_to: the ending date of the range of calories to get
+        time_from: the beginning time of the range of calories to get
+        time_to: the ending time of the range of calories to get
+    Return:
+        A JSON representing the database version(s) of the calorie(s) specified
+        by the given arguments
+    """
+    if len(calorie_id) > 1:
+        calorie_id = int(calorie_id)
+    else:
+        calorie_id = None
+
+    if len(user_id) > 1:
+        user_id = int(user_id)
+    else:
+        user_id = None      
+
+    if len(date_from) > 1:
+        date_from = datetime.date(date_from)
+    else:
+        date_from = datetime.date.min
+
+    if len(date_to) > 1:
+        date_to = datetime.date(date_to)
+    else:
+        date_from = datetime.date.max
+
+    if len(time_from) > 1:
+        time_from = datetime.time(time_from)
+    else:
+        time_from = datetime.time.min
+
+    if len(time_to) > 1:
+        time_to = datetime.time(time_to)
+    else:
+        time_to = datetime.time.max
+
+    calorie = DataManager.get_calorie(calorie_id=calorie_id, 
+        user_id=user_id, date_from=date_from, date_to=date_to, 
+        time_from=time_from, time_to=time_to)
+
+    print calorie
+
+    return jsonify(Data=calorie.serialize)
+
+@ccapp.route('/calorie/id=<int:calorie_id>+user_id=<int:calorie_id>+date_from=<int:date_from>+date_to=<int:date_to>+time_from=<int:time_from>+time_to=<int:time_time>/', 
+        methods=['GET'])
+def edit_calorie(calorie_id, user_id, date_from, date_to, time_from, time_to):
+    """Endpoint for editing calorie records in the database.
     """
     #data = DataManager.getData(id)
 
     #return jsonify(Data=data.serialize)
 
+@ccapp.route('/calorie/user_id=<int:calorie_id>+date_from=<int:date_from>+date_to=<int:date_to>+time_from=<int:time_from>+time_to=<int:time_time>/', 
+        methods=['GET'])
+def create_calorie(user_id, date_from, date_to, time_from, time_to):
+    """Endpoint for creating calorie records in the database.
+    """
+    #data = DataManager.getData(id)
+
+    #return jsonify(Data=data.serialize)
 
 # login/logout endpoints
 
