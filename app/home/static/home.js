@@ -51,6 +51,7 @@ var ccapp = angular.module("ccapp", []);
         };
 
         $scope.signout = function(forUserDeletion=0) {
+            // TO-DO: update this method
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
                 if (xhttp.readyState == 4 && xhttp.status == 200) {

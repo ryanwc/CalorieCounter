@@ -9,15 +9,10 @@ from sqlalchemy.orm import relationship
 # create an object to hold the database's data
 Base = declarative_base()
 
-'''
-Table('sometable', metadata,
-        Column('id', Integer, Sequence('some_id_seq'), primary_key=True)
-    )
-'''
 
 # define tables
 class UserType(Base):
-    """Table to hold 'user type' records.
+    """ORM mapping for SQL table 'user type' records.
     A 'user type' defines permissions for a user.
     """
     __tablename__ = 'user_type'
@@ -40,7 +35,7 @@ class UserType(Base):
 
 
 class User(Base):
-    """Table to hold 'user' records.
+    """ORM mapping for SQL table 'user' records.
     """
     __tablename__ = 'user'
 
@@ -67,7 +62,7 @@ class User(Base):
 
 
 class Calorie(Base):
-    """Table to hold 'calorie' records.
+    """ORM mapping for SQL table 'calorie' records.
     """
     __tablename__ = 'calorie'
 
