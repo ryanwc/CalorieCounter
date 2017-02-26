@@ -13,13 +13,12 @@
 	<!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.2/angular.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.2/angular-route.js"></script>
-    <script src="{{url_for('home.static', filename='home.js')}}"></script>
 
 {% endblock %}
 
 {% block pageContent %}
 
-	<div ng-app="ccapp" ng-controller="homeCtrl">
+	<div ng-app="ccapp" ng-controller="homeCtrl" id="homeCtrlDiv">
 
 		<div class="outerdiv" id="headerdiv">
 			<h1 id="headerlogo">Calorie Counter</h1>
@@ -68,17 +67,17 @@
 			<div class='signedIn-//isSignedIn()//' ng-show="isSignedIn()">
 				<span id='signInMessage'>Signed in as </span>
 				<br>
-				<a class='acrud read edit delete' id='profileCRUD'
+				<a class="crud read edit delete" id="profileCRUD"
 	               href="">View/edit your profile</a>
-		    	<div class='signOut'>
+		    	<div class="signOut">
 		    		<a class="backLink" href="#" ng-submit="signOut()">Sign out</a>
 		    	</div>
 			</div>
-			<div class='signedIn-//!isSignedIn()//' ng-show="!isSignedIn()" id='signInButton'>
+			<div class="signedIn-//!isSignedIn()//" ng-show="!isSignedIn()" id="signInButton">
 				<div class="g-signin"
 					data-scope="openid email"
 	            	data-redirecturi="postmessage"
-	            	data-clientid="446362929824-aoa0sov3apqfqin1njstj6hu078e49ap.apps.googleusercontent.com"
+	            	data-clientid="104598252187-0rbq64ac895hj3pkc0unepar2n1cf7j9.apps.googleusercontent.com"
 	            	data-accesstype="offline"
 	            	data-cookiepolicy="single_host_origin"
 	            	data-callback="signInCallback"
@@ -86,7 +85,8 @@
 	    		</div>
 	    	</div>
 	    </div>
-		</div>
+
+		<div class="hidden" id="state" ng-model="state">{{state}}</div>
 
 	</div>
 	<!-- end ng-app and controller div -->
@@ -95,12 +95,12 @@
 
 
 {% block scripts %}
-	
+
+	<!--// load angular app -->
+	<script src="{{url_for('home.static', filename='home.js')}}"></script>
 	<!--
 	<script src="bower_components/jquery.js"></script>
 	<script src="bower_components/knockout.js"></script>		
-	<script src="js/app.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBz6Og92aUD75aW9vxng8igWUKrjCJXT-U&libraries=places&callback=initMap" async defer onerror="alertUserOfError('The Google Map failed to load, so you will not see locations of any gems.');"></script>
 	-->
 
 {% endblock %}

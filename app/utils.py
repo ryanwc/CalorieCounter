@@ -1,29 +1,8 @@
 from flask import flash, session as login_session
 
-from api.api import user_type_json, user_json, calorie_json
-
 from . import ccapp, DataManager
 
 import bleach, json, re
-
-
-def write_tables_to_json(path):
-    """Write all of the tables in the database to .json files
-    in the specified directory.
-    """
-    table_json_endpoints = [{'func':user_type_json, 'name':'UserType'},
-                            {'func':user_json, 'name':'User'},
-                            {'func':calorie_json, 'name':'Calorie'}]
-
-    for table in table_json_endpoints:
-        func = table['func']
-        response = func()
-        data = response.data
-        name = func.__name__
-        name = name[:-4]
-        file = open(path+table['name']+'.json', 'w')
-        file.write(data)
-        file.close()
 
 
 def is_logged_in():
@@ -46,17 +25,9 @@ def set_session_user_info():
         user = DataManager.get_user(email=login_session['email'])
 
     login_session['user_id'] = user.id
-    login_session['username'] = user.name
-
-
-def get_signin_alert():
-    """Return a JSON-format object representing a successful signin.
-    """
-    output = {}
-    output['loginMessage'] = "Welcome, " + login_session['username'] + "!"
-    flash("you are now logged in as %s" % login_session['username'])
-
-    return json.dumps(output)
+    login_session['username'] = user.username
+    login_session['user_type_id'] = user.user_type_id
+    login_session['exp_cal'] = user.exp_cal_day
 
 
 def get_client_login_session():

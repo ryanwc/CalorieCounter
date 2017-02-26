@@ -16,22 +16,28 @@ def get_calorie_db_session():
     return session
 
 
-def add_user(username, email, google_id, exp_cal_day=None):
+def add_user(username, email, exp_cal_day=None, user_type=None):
     """Add a user to the database.
 
     Args:
         username: the username of the user to add
         email: the email of the user to add
-        google_id: the google account id of the user to add
         exp_cal_day: the number of calories the user expects
             to consume per day
     Returns:
         Returns the user id of the created user record
     """
-    '''
-    session = getCalorieDBSession()
+    session = get_calorie_db_session()
 
-    user = User(name=name, email=email)
+    if not user_type:
+        user_type = get_user_type(CRUD_self=True, 
+            CRUD_users=False, CRUD_all=False)[0]
+
+    if not exp_cal_day:
+        exp_cal_day = 0
+
+    user = User(username=username, email=email, exp_cal_day=exp_cal_day, 
+        user_type=user_type)
 
     session.add(user)
     session.flush()
@@ -39,7 +45,7 @@ def add_user(username, email, google_id, exp_cal_day=None):
     session.commit()
     session.close()
 
-    return user_id'''
+    return user_id
 
 
 def add_user_type(name, CRUD_self, CRUD_users, CRUD_all):
@@ -73,30 +79,28 @@ def add_calorie(user_id, date, time, text, num_calories):
     """
 
 
-def get_user(user_id=None, username=None, email=None, google_id=None):
+def get_user(user_id=None, username=None, email=None):
     """Return the user that matches the given arguments.
 
     Args:
-        user_id: A list of user ids
-        username: A list of usernames
-        email: A list of email addresses
-        google_id: A list of google account ids
+        user_id: A user id
+        username: A username
+        email: An email address
     Returns:
-        The user(s) specified by the arguments. If no arguments are given,
+        The user specified by the arguments. If no arguments are given,
         returns all users.
     """
-    '''
-    session = getCalorieDBSession()
+    session = get_calorie_db_session()
 
     if user_id is not None:
         user = session.query(User).filter_by(id=user_id).first()
     elif email is not None:
         user = session.query(User).filter_by(email=email).first()
     else:
-        users = session.query(User).order_by(User.id).all()
+        user = session.query(User).order_by(User.id).all()
 
     session.close()
-    return user'''
+    return user
 
 
 def get_user_type(user_type_id=None, name=None, CRUD_self=None,
@@ -104,11 +108,11 @@ def get_user_type(user_type_id=None, name=None, CRUD_self=None,
     """Return the user type(s) that matches the given arguments.
 
     Args:
-      user_type_id: A list of user type ids
-      name: A list of user type names
+      user_type_id: A user type id
+      name: A user type name
       CRUD_self: whether the user type(s) to get can edit its own
         calorie entries
-      CRUD_users: whether the user type to get can edit other
+      CRUD_users: whether the user type(s) to get can edit other
         users (but not their calorie entries)
       CRUD_all: whether the user type to get can edit all users and
         calorie entries
@@ -116,6 +120,23 @@ def get_user_type(user_type_id=None, name=None, CRUD_self=None,
         The user type(s) specified by the arguments. If no arguments
         are given, returns all user types.
     """
+    session = get_calorie_db_session()
+
+    if user_type_id is not None:
+        user_type = session.query(UserType).filter_by(id=user_type_id).first()
+    elif name is not None:
+        user_type = session.query(UserType).filter_by(name=name).first()
+    elif CRUD_self:
+        user_type = session.query(UserType).filter_by(CRUD_self=True).all()
+    elif CRUD_users:
+        user_type = session.query(UserType).filter_by(CRUD_users=True).all()
+    elif CRUD_all:
+        user_type = session.query(UserType).filter_by(CRUD_all=True).all()
+    else:
+        user_type = session.query(UserType).order_by(UserType.id).all()
+
+    session.close()
+    return user_type
 
 
 def get_calorie(calorie_id=None, user_ids=None, user_types=None,
@@ -199,7 +220,7 @@ def delete_user(user_id):
         user_id: the id of the user to remove
     """
     '''
-    session = getCalorieDBSession()
+    session = get_calorie_db_session()
 
     calories = getCalories(user_id=user_id)
 
@@ -242,15 +263,14 @@ def add_rows_from_json(json_rows, table_constructor):
         json_rows: the rows to add in json format
         table_constructor: the Python constructor for the target table
     """
-    '''
-    session = getCalorieDBSession()
+    session = get_calorie_db_session()
     
-    for jsonRow in jsonRows:
-        dbRow = tableConstructor(**jsonRow)
-        session.add(dbRow)
+    for json_row in json_rows:
+        db_row = table_constructor(**json_row)
+        session.add(db_row)
         session.commit()
 
-    session.close()'''
+    session.close()
 
 
 def drop_all_records():

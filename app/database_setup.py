@@ -46,10 +46,9 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     username = Column(String(30), nullable=False)
-    google_id = Column(Integer, unique=True, nullable=False)
     email = Column(String(30), unique=True, nullable=False)
     exp_cal_day = Column(Integer, nullable=False)
-    user_type = Column(Integer, ForeignKey('user_type.id'))
+    user_type_id = Column(Integer, ForeignKey('user_type.id'))
 
     user_type = relationship(UserType)
 

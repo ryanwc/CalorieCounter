@@ -1,0 +1,25 @@
+{
+  "UserTypes": [
+    {
+      "id": 1,
+      "name": "User",
+      "CRUD_self": true,
+      "CRUD_users": false,
+      "CRUD_all": false
+    },
+    {
+      "id": 2,
+      "name": "Manager",
+      "CRUD_self": true,
+      "CRUD_users": true,
+      "CRUD_all": false
+    },
+    {
+      "id": 3,
+      "name": "Admin",
+      "CRUD_self": true,
+      "CRUD_users": true,
+      "CRUD_all": true
+    }
+  ]
+}

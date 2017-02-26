@@ -61,6 +61,9 @@ li {
 	background-color: #ffffff;
 	width: 70px;
 }
+.hidden {
+	display: none;
+}
 
 /* specific elements */
 #flash          {
