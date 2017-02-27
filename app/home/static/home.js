@@ -16,7 +16,9 @@ var ccapp = angular.module("ccapp", []);
 
         /* vars related to database info*/
         $scope.curr_cals = [];
+        $scope.curr_cal_dict = {};
         $scope.curr_users = [];
+        $scope.curr_user_dict = {};
 
         $scope.curr_cal = {
             id: "",
@@ -104,6 +106,7 @@ var ccapp = angular.module("ccapp", []);
         $scope.setCalsFromServer = function (data) {
 
             $scope.curr_cals = [];
+            $scope.curr_cal_dict = {};
             $scope.pushCalsFromServer(data);
         };
 
@@ -112,6 +115,7 @@ var ccapp = angular.module("ccapp", []);
 
             /*
             $scope.curr_users = [];
+            $scope.curr_user_dict = {};
             $scope.pushUsersFromServer(data);           
             */
         };
@@ -119,14 +123,16 @@ var ccapp = angular.module("ccapp", []);
         /* calorie view functions */
 
         // set the currently selected calorie to the given calorie
-        $scope.setCurrCalorie = function(data, isClear) {
+        $scope.setCurrCalorie = function(isClear, data) {
 
-            $scope.curr_cal.id = isClear ? "" : data.data.calorie_id;
-            $scope.curr_cal.user_id = isClear ? "" : data.data.user_id;
-            $scope.curr_cal.date = isClear ? "" : data.data.date;
-            $scope.curr_cal.time = isClear ? "" : data.data.time;
-            $scope.curr_cal.amnt = isClear ? "" : data.data.num_calories;
-            $scope.curr_cal.text = isClear ? "" : data.data.text;
+            $scope.curr_cal.id = isClear ? "" : data.id;
+            $scope.curr_cal.user_id = isClear ? "" : data.user_id;
+            $scope.curr_cal.date = isClear ? "" : data.date;
+            $scope.curr_cal.time = isClear ? "" : data.time;
+            $scope.curr_cal.amnt = isClear ? "" : data.amnt;
+            $scope.curr_cal.text = isClear ? "" : data.text;
+            console.log("curr cal is");
+            console.log($scope.curr_cal);
         };
 
         // toggle the total calorie view on or off
@@ -136,18 +142,25 @@ var ccapp = angular.module("ccapp", []);
             }
             else {
                 $scope.viewingCalories = false;
+                $scope.setCurrCalorie(true);
                 $scope.toggleViewCalorie(false);
             }
         };   
 
         // toggle the specific calorie view on or off
-        $scope.toggleViewCalorie = function(isShow) {
+        $scope.toggleViewCalorie = function(isShow, calID) {
             if (isShow) {
                 $scope.viewingCalorie = true;
+                $scope.setCurrCalorie(false, $scope.curr_cal_dict[parseInt(calID)]);
+                $scope.togglePostCalorie(false, false);
             }
             else {
                 $scope.viewingCalorie = false;
-                $scope.togglePostCalorie(false, false);
+                $scope.setCurrCalorie(true);
+                if (!$scope.addingCalorie) {
+                    // if we're not adding a calorie, also turn cal form off
+                    $scope.togglePostCalorie(false, false);
+                }
             }
         };
 
@@ -157,9 +170,12 @@ var ccapp = angular.module("ccapp", []);
             if (isShow) {
                 if (isAdd) {
                     $scope.addingCalorie = true;
+                    $scope.editingCalorie = false;
                     $scope.setPostCalorie(true);
+                    $scope.toggleViewCalorie(false);
                 }
                 else {
+                    $scope.addingCalorie = false;
                     $scope.editingCalorie = true;
                     $scope.setPostCalorie(false);
                 }
@@ -238,14 +254,18 @@ var ccapp = angular.module("ccapp", []);
             for (var i = 0; i < data.length; i++) {
                 console.log("pushing:");
                 console.log(data[i]);
-                $scope.curr_cals.push({
+
+                var cal = {
                     id: data[i].id,
                     user_id: data[i].user_id,
                     date: data[i].date,
                     time: data[i].time,
                     amnt: data[i].num_calories,
                     text: data[i].text
-                });           
+                };
+
+                $scope.curr_cals.push(cal);  
+                $scope.curr_cal_dict[cal.id] = cal;         
             }
         };
 
@@ -253,14 +273,20 @@ var ccapp = angular.module("ccapp", []);
         $scope.pushUsersFromServer = function(data) {
             /*
             for (var i = 0; i < data.length; i++) {
-                $scope.curr_cals.push({
-                    id: data[i].calorie_id,
+                console.log("pushing:");
+                console.log(data[i]);
+
+                var cal = {
+                    id: data[i].id,
                     user_id: data[i].user_id,
                     date: data[i].date,
                     time: data[i].time,
                     amnt: data[i].num_calories,
                     text: data[i].text
-                });           
+                };
+
+                $scope.curr_cals.push(cal);  
+                $scope.curr_cal_dict[cal.id] = cal;            
             }*/
         };
 

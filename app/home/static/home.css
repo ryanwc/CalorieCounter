@@ -26,20 +26,17 @@ li {
 	border-radius: 5px;
 }
 
-.crud {
-	color: #c299ff;
+.click:hover {
+	cursor: pointer;
 }
-.read {
-	color: #c299ff;
+.addclick {
+	background-color: #00ff00;
 }
-.add {
-	color: #c299ff;
+.editclick {
+	background-color: #ffff00;
 }
-.edit {
-	color: #ff3c00;
-}
-.delete {
-	color: #ffcc99;
+.deleteclick {
+	background-color: #ff0000;
 }
 
 .signedIn-true {
@@ -119,7 +116,7 @@ li {
 
 }
 #calorielistlist {
-	background-color: #cce6ff;
+	background-color: #b3b3b3;
 	padding-left: 15px;
 	padding-right: 15px;
 	padding-top: 2px;
@@ -132,7 +129,7 @@ li {
 
 }
 #postcaloriediv {
-	
+
 }
 
 #controldiv	{
@@ -181,16 +178,6 @@ li {
 	overflow-y: scroll;
 	display: flex;
 	flex-wrap: wrap;
-}*/
-
-/*
-#something {
-	background-color: #009900;
-	color: white;
-}
-
-#something:hover {
-	cursor: pointer;
 }*/
 
 /* circular loading gif
