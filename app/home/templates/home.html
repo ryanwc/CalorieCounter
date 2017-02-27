@@ -24,18 +24,6 @@
 			<h1 id="headerlogo">Calorie Counter</h1>
 			<p id="headerlogophrase">Record and analyze how many calories you consume each day</p>
 		</div>
-
-		<div class="outerdiv" id="flashdiv">
-			{% with messages = get_flashed_messages() %}
-				{% if messages %}
-					<ul>
-						{% for message in messages %}
-							<li><strong><{{message}}</strong></li>
-						{% endfor %}
-					</ul>
-				{% endif %}
-			{% endwith %}
-		</div>
 		
 		<!-- extension: sub angular views in and out based on controldiv selections -->
 		<div class="outerdiv mainviewdiv" id="caloriediv" ng-show="viewingCalories">
@@ -44,14 +32,16 @@
 				<span id="calorielistheader"><button class="click addclick" type="button" ng-click="togglePostCalorie(true, true)">Add a calorie</button>, or click a calorie to view/edit</span>
 				<div id="calorielistlist">
 					<span class="calorieslistcal" ng-repeat="cal in curr_cals">
-			      		<button class="click calbutton" id="cal-//cal.id//" type="button" ng-click="toggleViewCalorie(true, cal.id)">Calorie //$index + 1//:</button> <span>Date: //cal.date//; Amount: //cal.amnt//</span>
+			      		<button class="click calbutton" id="cal-//cal.id//" type="button" ng-click="toggleViewCalorie(true, cal.id)">Calorie //cal.id//:</button> <span>Date: //cal.date_str//; Amount: //cal.amnt//</span>
 			      		<br>
 			      	</span>
 			    </div>
 			</div>
 
 			<div id="singlecaloriediv" ng-show="viewingCalorie">
-		      	<span>Date: //curr_cal.date//</span>
+				<span id="singlecalorieheader">Calorie //curr_cal.id//</span>
+				<br>
+		      	<span>Date: //curr_cal.date_str//</span>
 		      	<br>
 		      	<span>Time: //curr_cal.time//</span>
 		      	<br>
@@ -59,7 +49,7 @@
 		      	<br>
 		      	<span>Text: //curr_cal.text//</span>
 		      	<br>
-		      	<button class="click editclick" type="button" ng-click="togglePostCalorie(true, false)">edit calorie</button> | <button class="click deleteclick" ng-click="deleteCalorie()">delete calorie</button> | <button type="button" ng-click="toggleViewCalorie(false)">stop viewing calorie</button>
+		      	<button class="click editclick" type="button" ng-click="togglePostCalorie(true, false)">edit calorie</button> | <button class="click deleteclick" ng-click="deleteCalorie()">delete calorie</button> | <button type="button" ng-click="toggleViewCalorie(false)">close calorie</button>
 			</div>
 
 			<div id="postcaloriediv" ng-show="addingCalorie || editingCalorie">
@@ -69,7 +59,7 @@
 					<br>
 					<span class="attridentifier">Date: </span><input type="date" ng-model="post_cal.date">
 					<br> 
-					<span class="attridentifier">Time: </span><input type="range" max="24" min="0" step="1" ng-model="post_cal.time">
+					<span class="attridentifier">Time: </span><input type="range" max="24" min="0" step="1" ng-model="post_cal.time"><span> //post_cal.time//:00</span>
 					<br>
 					<span class="attridentifier">Number of calories: </span><input type="text" ng-model="post_cal.amnt">
 					<br>
@@ -83,6 +73,7 @@
 		</div>
 		<!-- end calorie main view -->
 
+		<!-- high-level controls and signin/out -->
 		<div class="outerdiv" id="controldiv">
 			<div class='signedIn-//isSignedIn()//' ng-show="isSignedIn()">
 				<span id='signInMessage'>Signed in as //log_user.username//</span>
@@ -114,6 +105,7 @@
 	    		</div>
 	    	</div>
 	    </div>
+	    <!-- end high-level controls and signin/out -->
 
 		<div class="hidden" id="state" ng-model="state">{{state}}</div>
 

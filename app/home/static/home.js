@@ -12,7 +12,7 @@ var ccapp = angular.module("ccapp", []);
         $interpolateProvider.endSymbol('//');
     });
 
-    ccapp.controller("homeCtrl", function($scope, $http) {
+    ccapp.controller("homeCtrl", function($scope, $http, $filter) {
 
         /* vars related to database info*/
         $scope.curr_cals = [];
@@ -23,7 +23,9 @@ var ccapp = angular.module("ccapp", []);
         $scope.curr_cal = {
             id: "",
             user_id: "",
+            date_str: "",
             date: "",
+            time_str: "",
             time: "",
             amnt: "",
             text: ""
@@ -32,7 +34,9 @@ var ccapp = angular.module("ccapp", []);
         $scope.post_cal = {
             id: "",
             user_id: "",
+            date_str: "",
             date: "",
+            time_str: "",
             time: "",
             amnt: "",
             text: ""
@@ -127,7 +131,9 @@ var ccapp = angular.module("ccapp", []);
 
             $scope.curr_cal.id = isClear ? "" : data.id;
             $scope.curr_cal.user_id = isClear ? "" : data.user_id;
+            $scope.curr_cal.date_str = isClear ? "" : data.date_str;
             $scope.curr_cal.date = isClear ? "" : data.date;
+            $scope.curr_cal.time_str = isClear ? "" : data.time_str;
             $scope.curr_cal.time = isClear ? "" : data.time;
             $scope.curr_cal.amnt = isClear ? "" : data.amnt;
             $scope.curr_cal.text = isClear ? "" : data.text;
@@ -192,7 +198,9 @@ var ccapp = angular.module("ccapp", []);
             console.log($scope.post_cal);
             $scope.post_cal.id = isClear ? "" : $scope.curr_cal.id;
             $scope.post_cal.user_id = isClear ? "" : $scope.curr_cal.user_id;
+            $scope.post_cal.date_str = isClear ? "" : $scope.curr_cal.date_str;
             $scope.post_cal.date = isClear ? "" : $scope.curr_cal.date;
+            $scope.post_cal.time_str = isClear ? "" : $scope.curr_cal.time_str;
             $scope.post_cal.time = isClear ? "" : $scope.curr_cal.time;
             $scope.post_cal.amnt = isClear ? "" : $scope.curr_cal.amnt;
             $scope.post_cal.text = isClear ? "" : $scope.curr_cal.text;
@@ -216,8 +224,7 @@ var ccapp = angular.module("ccapp", []);
 
             // TO-DO:loading graphic
             var user_id = $scope.log_user.id;
-            var dates = new Date($scope.post_cal.date);
-            var date = dates.getFullYear() + "-" + (dates.getMonth()+1) + "-" + dates.getDate();
+            var date = $scope.post_cal.date.getFullYear() + "-" + ($scope.post_cal.date.getMonth()+1) + "-" + $scope.post_cal.date.getDate();
             var time = $scope.post_cal.time;
             var text = $scope.post_cal.text;
             var amnt = $scope.post_cal.amnt;
@@ -258,8 +265,10 @@ var ccapp = angular.module("ccapp", []);
                 var cal = {
                     id: data[i].id,
                     user_id: data[i].user_id,
-                    date: data[i].date,
-                    time: data[i].time,
+                    date_str: data[i].date,
+                    date: new Date(data[i].date),
+                    time_str: data[i].time,
+                    time: parseInt(data[i].time.substring(0,2)),
                     amnt: data[i].num_calories,
                     text: data[i].text
                 };
