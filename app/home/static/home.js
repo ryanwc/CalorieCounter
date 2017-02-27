@@ -223,7 +223,7 @@ var ccapp = angular.module("ccapp", []);
         $scope.addCalorie = function(callback) {
 
             // TO-DO:loading graphic
-            var user_id = $scope.log_user.id;
+            var user_id = $scope.curr_user.id;
             var date = $scope.post_cal.date.getFullYear() + "-" + ($scope.post_cal.date.getMonth()+1) + "-" + $scope.post_cal.date.getDate();
             var time = $scope.post_cal.time;
             var text = $scope.post_cal.text;
@@ -239,8 +239,12 @@ var ccapp = angular.module("ccapp", []);
             .then(function(resp){
                 console.log(resp);
                 callback(resp.data["Data"]);
+                $scope.addingCalorie = false;
+                $scope.editingCalorie = false;
+                $scope.toggleViewCalorie(false);
+                window.alert("Successfully added calorie");
             },function(error){
-                console.log('There was an error adding calories to the server');
+                window.alert('There was an error adding calorie to the server, check log');
                 console.log(error);
             });
         };
@@ -248,11 +252,121 @@ var ccapp = angular.module("ccapp", []);
         // do ajax call to edit calorie in server database
         $scope.editCalorie = function() {
 
+            var calorie_id = $scope.post_cal.id;
+            var user_id = $scope.curr_user.id;
+            var date = $scope.post_cal.date.getFullYear() + "-" + ($scope.post_cal.date.getMonth()+1) + "-" + $scope.post_cal.date.getDate();
+            var time = $scope.post_cal.time;
+            var text = $scope.post_cal.text;
+            var amnt = $scope.post_cal.amnt;
+
+            $http({
+                method:'POST',
+                url: "/edit_calorie?calorie_id="+calorie_id+"&user_id="+user_id+"&date="+date+"&time="+time+"&text="+text+"&amnt="+amnt,
+                headers: {
+                   'Content-Type': 'application/json;charset=utf-8'
+                }
+            })
+            .then(function(resp){
+                console.log(resp);
+                $scope.onEditSuccessful(resp.data["Data"], "calorie");
+                window.alert("Successfully edited calorie");
+            },function(error){
+                window.alert('There was an error editing the calorie on the server, check log');
+                console.log(error);
+            });
         };
 
-        // do ajax call to delete a calorie from server database
-        $scope.deleteCalorie = function() {
+        // update model/view on successful deletion from server
+        $scope.onEditSuccessful = function(data, model) {
 
+            console.log(data);
+            if (model === "calorie") {
+                $scope.editCalorieInCurr(data);
+                $scope.setCurrCalorie(false, $scope.curr_cal_dict[data[0].id]);
+                $scope.addingCalorie = false;
+                $scope.editingCalorie = false;
+                $scope.togglePostCalorie(false);
+            }
+            else {
+                $scope.removeUserFromCurr();
+            }
+        }
+
+        // do ajax call to delete a calorie from server database
+        // if successful, tell user and remove cal from curr_cal list and dict in angular
+        $scope.deleteCalorie = function(callback) {
+
+            // TO-DO:loading graphic
+            $http({
+                method:'POST',
+                url: "/delete_calorie?calorie_id="+$scope.curr_cal.id,
+                headers: {
+                   'Content-Type': 'application/json;charset=utf-8'
+                }
+            })
+            .then(function(resp){
+                console.log(resp);
+                $scope.onDeleteSuccessful(resp.data);
+                window.alert("Successfully deleted calorie");
+            },function(error){
+                window.alert('There was an error deleting the calorie from the server, check log');
+                console.log(error);
+            });
+        };
+
+        // update model/view on successful deletion from server
+        $scope.onDeleteSuccessful = function(data) {
+
+            console.log(data);
+            if (data.Model === "calorie") {
+                $scope.removeCalorieFromCurr($scope.curr_cal.id);
+                $scope.addingCalorie = false;
+                $scope.editingCalorie = false;
+                $scope.toggleViewCalorie(false);
+            }
+            else {
+                $scope.removeUserFromCurr();
+            }
+        };
+
+        // remove a calorie from the model/view by id
+        $scope.removeCalorieFromCurr = function(calID) {
+
+            for (var i = 0; i < $scope.curr_cals.length; i++) {
+                if ($scope.curr_cals[i].id === calID) {
+                    $scope.curr_cals = $scope.curr_cals.splice(i, 1);
+                    break;
+                }
+            }
+            delete $scope.curr_cal_dict[parseInt(calID)];
+        };
+
+        $scope.editCalorieInCurr = function(data) {
+
+            var cal = {
+                id: data[0].id,
+                user_id: data[0].user_id,
+                date_str: data[0].date,
+                date: new Date(data[0].date),
+                time_str: data[0].time,
+                time: parseInt(data[0].time.substring(0,2)),
+                amnt: data[0].num_calories,
+                text: data[0].text
+            };
+            
+            console.log("before edit");
+            console.log($scope.curr_cal_dict[data[0].id]);
+            // replace with edited calorie
+            for (var i = 0; i < $scope.curr_cals.length; i++) {
+
+                if ($scope.curr_cals[i].id === cal.id) {
+                    $scope.curr_cals[i] = cal;
+                    break;
+                }
+            }
+            $scope.curr_cal_dict[data[0].id] = cal;     
+            console.log("after edit");
+            console.log($scope.curr_cal_dict[data[0].id]);
         };
 
         // push calories from server to the current calorie list
@@ -331,11 +445,11 @@ var ccapp = angular.module("ccapp", []);
         /* user view functions */
         
         // set the currently selected user to the given user
-        $scope.setCRUDUserInfo = function(isClear, data) {
-            $scope.crud_user_id = isClear ? "" : data.data.user_id;
-            $scope.crud_username = isClear ? "" : data.data.username;
-            $scope.crud_user_type = isClear ? "" : data.data.user_type;
-            $scope.crud_exp_cal = isClear ? "" : data.data.exp_cal;
+        $scope.setCurrUserInfo = function(isClear, data) {
+            $scope.curr_user.id = isClear ? "" : data.data.user_id;
+            $scope.curr_user.username = isClear ? "" : data.data.username;
+            $scope.curr_user.user_type = isClear ? "" : data.data.user_type;
+            $scope.curr_user.exp_cal = isClear ? "" : data.data.exp_cal;
         };
 
         $scope.toggleViewUsers = function(isShow) {
@@ -377,6 +491,7 @@ var ccapp = angular.module("ccapp", []);
             .then(function(resp){
                 console.log(resp);
                 $scope.setLoggedInUserInfo(false, resp);
+                $scope.setCurrUserInfo(false, resp);
                 $scope.setTotalDataByUser();
             },function(error){
                 console.log(error);
@@ -397,6 +512,7 @@ var ccapp = angular.module("ccapp", []);
             .then(function(resp){
                 console.log(resp);
                 $scope.setLoggedInUserInfo(true, resp);
+                $scope.setCurrUserInfo(true, resp);
                 $scope.toggleViewCalories(false);
                 window.alert("Logged out");
             },function(error){

@@ -357,9 +357,11 @@ def edit_calorie():
     else:
         amnt = None 
 
-    cal_id = DataManager.edit_calorie(calorie_id, user_id=user_id, date=date,
+    DataManager.edit_calorie(calorie_id, user_id=user_id, date=date,
         time=time, text=text, num_calories=amnt)
-    calorie = DataManager.get_calorie(calorie_id=cal_id)
+    calorie = DataManager.get_calorie(calorie_id=calorie_id)
+
+    print calorie
 
     if calorie:
         return jsonify(Data=[calorie.serialize])
@@ -382,10 +384,18 @@ def delete_calorie():
         len(request.args.get("calorie_id")) > 0:
 
         calorie_id = int(request.args.get("calorie_id"))
-        DataManager.delete_calorie(calorie_id)
-        return jsonify({"Message": "Deleted calorie " + calorie_id})
+        result = DataManager.delete_calorie(calorie_id)
+        if result == 1:
+            return jsonify({"Message": "Successful deletion",
+                            "Post": "deletion",
+                            "Model": "calorie",
+                            "Id": calorie_id})
+        else:
+            response = make_response(json.\
+                dumps('Calorie id did not match any in db'), 401)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
-
         response = make_response(json.dumps('Invalid calorie id'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response

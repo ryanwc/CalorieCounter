@@ -299,8 +299,11 @@ def edit_calorie(calorie_id, user_id=None, date=None, time=None,
     if date:
         calorie.date = date
     
+    if time:
+        calorie.time = time
+        
     if text:
-        calorie.CRUD_text = text
+        calorie.text = text
 
     if num_calories:
         calorie.num_calories = num_calories
@@ -315,6 +318,8 @@ def delete_user(user_id):
 
     Args:
         user_id: the id of the user to remove
+    Return:
+        sqlalchemy result object of query
     """
     session = get_calorie_db_session()
 
@@ -323,10 +328,12 @@ def delete_user(user_id):
     for calorie in calories:
         delete_calorie(calorie.id)
 
-    session.query(User).filter_by(id=user_id).delete(synchronize_session=False)
+    result = session.query(User).\
+        filter_by(id=user_id).delete(synchronize_session=False)
 
     session.commit()
     session.close()
+    return result
 
 
 def delete_user_type(user_type_id):
@@ -337,6 +344,8 @@ def delete_user_type(user_type_id):
 
     Args:
         user_type_id: the id of the user type to remove
+    Return:
+        sqlalchemy result object of query
     """
     session = get_calorie_db_session()
 
@@ -345,25 +354,30 @@ def delete_user_type(user_type_id):
     for user in users:
         delete_user(user.id)
 
-    session.query(UserType).filter_by(id=user_type_id).\
+    result = session.query(UserType).filter_by(id=user_type_id).\
         delete(synchronize_session=False)
 
     session.commit()
     session.close()
+    return result
 
-def delete_calorie(calore_id):
+def delete_calorie(calorie_id):
     """Remove a calorie record from the database.
 
     Args:
         calorie_id: the id of the calorie record to remove
+    Return:
+        sqlalchemy result object of query
     """
     session = get_calorie_db_session()
 
-    session.query(Calorie).filter_by(id=calorie_id).\
+    result = session.query(Calorie).filter_by(id=calorie_id).\
         delete(synchronize_session=False)
 
     session.commit()
     session.close()
+    print result
+    return result
 
 def add_rows_from_json(json_rows, table_constructor):
     """Convenience function: Populate the database from json-formatted data.
