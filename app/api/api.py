@@ -18,20 +18,108 @@ CORS(ccapp)
 
 @ccapp.route('/user_type', methods=['GET', 'POST'])
 def user_type():
-    """JSON endpoint for serving user type data from the database.
-    """
-    #data = DataManager.getData()
+    """Endpoint for serving user type records from the database.
 
-    #return jsonify(Data=[i.serialize for i in data])
+    Args that can be sent as part of http query string:
+        user_type_id: A user type id
+        name: A user type name
+        CRUD_self: whether the user type(s) to get can edit its own
+        calorie entries
+        CRUD_users: whether the user type(s) to get can edit other
+        users (but not their calorie entries)
+        CRUD_all: whether the user type to get can edit all users and
+        calorie entries
+    Return:
+        A JSON representing the database version(s) of the user type(s) 
+        specified by the given arguments
+    """
+    if request.args.get("user_type_id") and \
+        len(request.args.get("user_type_id")) > 0:
+        user_type_id = int(request.data["user_type_id"])
+    else:
+        user_type_id = None
+
+    if request.args.get("name") and \
+        len(request.args.get("name")) > 0:
+        name = int(request.data["name"])
+    else:
+        name = None    
+
+    if request.args.get("CRUD_self") and \
+        len(request.args.get("CRUD_self")) > 0:
+        CRUD_self = request.data["CRUD_self"]
+    else:
+        CRUD_self = None
+
+    if request.args.get("CRUD_users") and \
+        len(request.args.get("CRUD_users")) > 0:
+        CRUD_users = request.data["CRUD_users"]
+    else:
+        CRUD_users = None
+
+    if request.args.get("CRUD_all") and \
+        len(request.args.get("CRUD_all")) > 0:
+        CRUD_all = request.data["CRUD_all"]
+    else:
+        CRUD_all = None
+
+    user_type = DataManager.get_user_type(user_type_id=user_type_id, name=name, 
+        CRUD_self=CRUD_self, CRUD_users=CRUD_users, CRUD_all=CRUD_all)
+
+    if id in user_type:
+        # single result
+        return jsonify(Data=user_type.serialize)
+    elif len(user_type) > 0:
+        # multiple results
+        return jsonify(Data=[i.serialize for i in user_type])
+    else:
+        # no results, return empty list
+        return jsonify(user_type)
 
 
 @ccapp.route('/user', methods=['GET', 'POST'])
 def user():
-    """JSON endpoint for serving user data from the database.
-    """
-    #data = DataManager.getData(id)
+    """Endpoint for serving user records from the database.
 
-    #return jsonify(Data=data.serialize)
+    Args that can be sent as part of http query string:
+        user_id: the id of the user to get
+        email: the email of the user to get
+        username: the username of the user to get
+    Return:
+        A JSON representing the database version(s) of the user(s) specified
+        by the given arguments
+    """
+    print request.args
+
+    if request.args.get("user_id") and \
+        len(request.args.get("user_id")) > 0:
+        user_id = int(request.data["user_id"])
+    else:
+        user_id = None
+
+    if request.args.get("username") and \
+        len(request.args.get("username")) > 0:
+        username = int(request.data["username"])
+    else:
+        username = None    
+
+    if request.args.get("email") and \
+        len(request.args.get("email")) > 0:
+        email = request.data["email"]
+    else:
+        email = None
+
+    user = DataManager.get_user(user_id=user_id, username=username, email=email)
+
+    if id in user:
+        # single result
+        return jsonify(Data=user.serialize)
+    elif len(user) > 0:
+        # multiple results
+        return jsonify(Data=[i.serialize for i in user])
+    else:
+        # no results, return empty list
+        return jsonify(user)
 
 
 @ccapp.route('/calorie', methods=['GET', 'POST'])
