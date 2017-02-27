@@ -77,6 +77,28 @@ def user_type():
         return jsonify(user_type)
 
 
+@ccapp.route('/delete_user_type', methods=['POST'])
+def delete_user_type():
+    """Endpoint for deleting user type records from the database.
+
+    Args that can be sent as part of http query string:
+        user_type_id: the id of the user type to delete
+    Return:
+        A JSON representing deletion success or failure
+    """
+    if request.args.get("user_type_id") and \
+        len(request.args.get("user_type_id")) > 0:
+
+        user_type_id = int(request.data["user_type_id"])
+        DataManager.delete_user(user_type_id)
+        return jsonify({"Message": "Deleted calorie " + user_type_id})
+    else:
+
+        response = make_response(json.dumps('Invalid user type id'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+
 @ccapp.route('/user', methods=['GET', 'POST'])
 def user():
     """Endpoint for serving user records from the database.
@@ -122,8 +144,30 @@ def user():
         return jsonify(user)
 
 
-@ccapp.route('/calorie', methods=['GET', 'POST'])
-def calorie():
+@ccapp.route('/delete_user', methods=['POST'])
+def delete_user():
+    """Endpoint for deleting user records from the database.
+
+    Args that can be sent as part of http query string:
+        user_id: the id of the user to delete
+    Return:
+        A JSON representing deletion success or failure
+    """
+    if request.args.get("user_id") and \
+        len(request.args.get("user_id")) > 0:
+
+        user_id = int(request.data["user_id"])
+        DataManager.delete_user(user_id)
+        return jsonify({"Message": "Deleted calorie " + user_id})
+    else:
+
+        response = make_response(json.dumps('Invalid user id'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+
+@ccapp.route('/calorie', methods=['GET'])
+def get_calorie():
     """Endpoint for serving calorie records from the database.
 
     Args that can be sent as part of http query string:
@@ -137,8 +181,6 @@ def calorie():
         A JSON representing the database version(s) of the calorie(s) specified
         by the given arguments
     """
-    print request.args
-
     if request.args.get("calorie_id") and \
         len(request.args.get("calorie_id")) > 0:
         calorie_id = int(request.data["calorie_id"])
@@ -179,7 +221,6 @@ def calorie():
         user_id=user_id, date_from=date_from, date_to=date_to, 
         time_from=time_from, time_to=time_to)
 
-    print calorie
     if id in calorie:
         # single result
         return jsonify(Data=calorie.serialize)
@@ -190,6 +231,154 @@ def calorie():
         # no results, return empty list
         return jsonify(calorie)
 
+@ccapp.route('/add_calorie', methods=['POST'])
+def add_calorie():
+    """Endpoint for adding calorie records in the database.
+
+    Args that can be sent as part of http query string:
+        user_id: the calorie's user id
+        date: the calorie's date
+        time: the calorie's time
+        text: the calorie's description
+        amnt: the new number of calories
+    Return:
+        A JSON representing the database version(s) of the created calorie
+    """
+    if request.args.get("user_id") and \
+        len(request.args.get("user_id")) > 0:
+        user_id = int(request.data["user_id"])
+    else:
+        response = make_response(json.dumps('Must provide valid user id'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response  
+
+    if request.args.get("date") and \
+        len(request.args.get("date")) > 0:
+        date = request.data["date"]
+    else:
+        response = make_response(json.dumps('Must provide valid date'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response  
+
+    if request.args.get("time") and \
+        len(request.args.get("time")) > 0:
+        time = request.data["time"]
+    else:
+        response = make_response(json.dumps('Must provide valid time'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response  
+
+    if request.args.get("text") and \
+        len(request.args.get("text")) > 0:
+        text = request.data["text"]
+    else:
+        response = make_response(json.dumps('Must provide valid time'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response  
+
+    if request.args.get("amnt") and \
+        len(request.args.get("amnt")) > 0:
+        amnt = request.data["amnt"]
+    else:
+        response = make_response(json.dumps('Must provide valid amount'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response  
+
+    cal_id = DataManager.add_calorie(user_id, date, time, text, amnt)
+    calorie = DataManager.get_calorie(calorie_id=cal_id)
+
+    if calorie:
+        return jsonify(Data=calorie.serialize)
+    else:
+        response = make_response(json.dumps('Internal server error'), 500)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+
+@ccapp.route('/edit_calorie', methods=['POST'])
+def edit_calorie():
+    """Endpoint for editing calorie records in the database.
+
+    Args that can be sent as part of http query string:
+        calorie_id: the id of the calorie to edit
+        user_id: the new user id
+        date: the new date
+        time: the new time
+        text: the new description
+        num_calories: the new number of calories
+    Return:
+        A JSON representing the database version of the updated calorie
+    """
+    if request.args.get("calorie_id") and \
+        len(request.args.get("calorie_id")) > 0:
+        calorie_id = int(request.data["calorie_id"])
+    else:
+        response = make_response(json.dumps('Must provide calorie id'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response  
+
+    if request.args.get("user_id") and \
+        len(request.args.get("user_id")) > 0:
+        user_id = int(request.data["user_id"])
+    else:
+        user_id = None
+
+    if request.args.get("date") and \
+        len(request.args.get("date")) > 0:
+        date = request.data["date"]
+    else:
+        date = None
+
+    if request.args.get("time") and \
+        len(request.args.get("time")) > 0:
+        time = request.data["time"]
+    else:
+        time = None
+
+    if request.args.get("text") and \
+        len(request.args.get("text")) > 0:
+        text = request.data["text"]
+    else:
+        text = None
+
+    if request.args.get("amnt") and \
+        len(request.args.get("amnt")) > 0:
+        amnt = request.data["amnt"]
+    else:
+        amnt = None 
+
+    cal_id = DataManager.edit_calorie(calorie_id, user_id=user_id, date=date,
+        time=time, text=text, num_calories=amnt)
+    calorie = DataManager.get_calorie(calorie_id=cal_id)
+
+    if calorie:
+        return jsonify(Data=calorie.serialize)
+    else:
+        response = make_response(json.dumps('Internal server error'), 500)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+
+@ccapp.route('/delete_calorie', methods=['POST'])
+def delete_calorie():
+    """Endpoint for deleting calorie records from the database.
+
+    Args that can be sent as part of http query string:
+        calorie_id: the id of the calorie to delete
+    Return:
+        A JSON representing deletion success or failure
+    """
+    if request.args.get("calorie_id") and \
+        len(request.args.get("calorie_id")) > 0:
+
+        calorie_id = int(request.data["calorie_id"])
+        DataManager.delete_calorie(calorie_id)
+        return jsonify({"Message": "Deleted calorie " + calorie_id})
+    else:
+
+        response = make_response(json.dumps('Invalid calorie id'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
 # login/logout endpoints
 
