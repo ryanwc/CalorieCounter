@@ -35,31 +35,31 @@ def user_type():
     """
     if request.args.get("user_type_id") and \
         len(request.args.get("user_type_id")) > 0:
-        user_type_id = int(request.data["user_type_id"])
+        user_type_id = int(request.args.get("user_type_id"))
     else:
         user_type_id = None
 
     if request.args.get("name") and \
         len(request.args.get("name")) > 0:
-        name = int(request.data["name"])
+        name = int(request.args.get("name"))
     else:
         name = None    
 
     if request.args.get("CRUD_self") and \
         len(request.args.get("CRUD_self")) > 0:
-        CRUD_self = request.data["CRUD_self"]
+        CRUD_self = request.args.get("CRUD_self")
     else:
         CRUD_self = None
 
     if request.args.get("CRUD_users") and \
         len(request.args.get("CRUD_users")) > 0:
-        CRUD_users = request.data["CRUD_users"]
+        CRUD_users = request.args.get("CRUD_users")
     else:
         CRUD_users = None
 
     if request.args.get("CRUD_all") and \
         len(request.args.get("CRUD_all")) > 0:
-        CRUD_all = request.data["CRUD_all"]
+        CRUD_all = request.args.get("CRUD_all")
     else:
         CRUD_all = None
 
@@ -68,7 +68,7 @@ def user_type():
 
     if id in user_type:
         # single result
-        return jsonify(Data=user_type.serialize)
+        return jsonify(Data=[user_type.serialize])
     elif len(user_type) > 0:
         # multiple results
         return jsonify(Data=[i.serialize for i in user_type])
@@ -89,7 +89,7 @@ def delete_user_type():
     if request.args.get("user_type_id") and \
         len(request.args.get("user_type_id")) > 0:
 
-        user_type_id = int(request.data["user_type_id"])
+        user_type_id = int(request.args.get("user_type_id"))
         DataManager.delete_user(user_type_id)
         return jsonify({"Message": "Deleted calorie " + user_type_id})
     else:
@@ -115,19 +115,19 @@ def user():
 
     if request.args.get("user_id") and \
         len(request.args.get("user_id")) > 0:
-        user_id = int(request.data["user_id"])
+        user_id = int(request.args.get("user_id"))
     else:
         user_id = None
 
     if request.args.get("username") and \
         len(request.args.get("username")) > 0:
-        username = int(request.data["username"])
+        username = int(request.args.get("username"))
     else:
         username = None    
 
     if request.args.get("email") and \
         len(request.args.get("email")) > 0:
-        email = request.data["email"]
+        email = request.args.get("email")
     else:
         email = None
 
@@ -135,7 +135,7 @@ def user():
 
     if id in user:
         # single result
-        return jsonify(Data=user.serialize)
+        return jsonify(Data=[user.serialize])
     elif len(user) > 0:
         # multiple results
         return jsonify(Data=[i.serialize for i in user])
@@ -156,7 +156,7 @@ def delete_user():
     if request.args.get("user_id") and \
         len(request.args.get("user_id")) > 0:
 
-        user_id = int(request.data["user_id"])
+        user_id = int(request.args.get("user_id"))
         DataManager.delete_user(user_id)
         return jsonify({"Message": "Deleted calorie " + user_id})
     else:
@@ -183,37 +183,37 @@ def get_calorie():
     """
     if request.args.get("calorie_id") and \
         len(request.args.get("calorie_id")) > 0:
-        calorie_id = int(request.data["calorie_id"])
+        calorie_id = int(request.args.get("calorie_id"))
     else:
         calorie_id = None
 
     if request.args.get("user_id") and \
         len(request.args.get("user_id")) > 0:
-        user_id = int(request.data["user_id"])
+        user_id = int(request.args.get("user_id"))
     else:
         user_id = None    
 
     if request.args.get("date_from") and \
         len(request.args.get("date_from")) > 0:
-        date_from = request.data["date_from"]
+        date_from = request.args.get("date_from")
     else:
         date_from = datetime.date.min
 
     if request.args.get("date_to") and \
         len(request.args.get("date_to")) > 0:
-        date_to = request.data["date_to"]
+        date_to = request.args.get("date_to")
     else:
         date_to = datetime.date.max
 
     if request.args.get("time_from") and \
         len(request.args.get("time_from")) > 0:
-        time_from = request.data["time_from"]
+        time_from = request.args.get("date_to")
     else:
         time_from = datetime.time.min
 
     if request.args.get("time_to") and \
         len(request.args.get("time_to")) > 0:
-        time_to = request.data["time_to"]
+        time_to = request.args.get("time_to")
     else:
         time_to = datetime.time.max
 
@@ -223,7 +223,7 @@ def get_calorie():
 
     if id in calorie:
         # single result
-        return jsonify(Data=calorie.serialize)
+        return jsonify(Data=[calorie.serialize])
     elif len(calorie) > 0:
         # multiple results
         return jsonify(Data=[i.serialize for i in calorie])
@@ -244,9 +244,11 @@ def add_calorie():
     Return:
         A JSON representing the database version(s) of the created calorie
     """
+    print request.args
+
     if request.args.get("user_id") and \
         len(request.args.get("user_id")) > 0:
-        user_id = int(request.data["user_id"])
+        user_id = int(request.args.get("user_id"))
     else:
         response = make_response(json.dumps('Must provide valid user id'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -254,7 +256,7 @@ def add_calorie():
 
     if request.args.get("date") and \
         len(request.args.get("date")) > 0:
-        date = request.data["date"]
+        date = request.args.get("date")
     else:
         response = make_response(json.dumps('Must provide valid date'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -262,7 +264,7 @@ def add_calorie():
 
     if request.args.get("time") and \
         len(request.args.get("time")) > 0:
-        time = request.data["time"]
+        time = request.args.get("time")
     else:
         response = make_response(json.dumps('Must provide valid time'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -270,7 +272,7 @@ def add_calorie():
 
     if request.args.get("text") and \
         len(request.args.get("text")) > 0:
-        text = request.data["text"]
+        text = request.args.get("text")
     else:
         response = make_response(json.dumps('Must provide valid time'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -278,7 +280,7 @@ def add_calorie():
 
     if request.args.get("amnt") and \
         len(request.args.get("amnt")) > 0:
-        amnt = request.data["amnt"]
+        amnt = request.args.get("amnt")
     else:
         response = make_response(json.dumps('Must provide valid amount'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -288,7 +290,7 @@ def add_calorie():
     calorie = DataManager.get_calorie(calorie_id=cal_id)
 
     if calorie:
-        return jsonify(Data=calorie.serialize)
+        return jsonify(Data=[calorie.serialize])
     else:
         response = make_response(json.dumps('Internal server error'), 500)
         response.headers['Content-Type'] = 'application/json'
@@ -311,7 +313,7 @@ def edit_calorie():
     """
     if request.args.get("calorie_id") and \
         len(request.args.get("calorie_id")) > 0:
-        calorie_id = int(request.data["calorie_id"])
+        calorie_id = int(request.args.get("calorie_id"))
     else:
         response = make_response(json.dumps('Must provide calorie id'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -319,31 +321,31 @@ def edit_calorie():
 
     if request.args.get("user_id") and \
         len(request.args.get("user_id")) > 0:
-        user_id = int(request.data["user_id"])
+        user_id = int(request.args.get("user_id"))
     else:
         user_id = None
 
     if request.args.get("date") and \
         len(request.args.get("date")) > 0:
-        date = request.data["date"]
+        date = request.args.get("date")
     else:
         date = None
 
     if request.args.get("time") and \
         len(request.args.get("time")) > 0:
-        time = request.data["time"]
+        time = request.args.get("time")
     else:
         time = None
 
     if request.args.get("text") and \
         len(request.args.get("text")) > 0:
-        text = request.data["text"]
+        text = request.args.get("text")
     else:
         text = None
 
     if request.args.get("amnt") and \
         len(request.args.get("amnt")) > 0:
-        amnt = request.data["amnt"]
+        amnt = request.args.get("amnt")
     else:
         amnt = None 
 
@@ -352,7 +354,7 @@ def edit_calorie():
     calorie = DataManager.get_calorie(calorie_id=cal_id)
 
     if calorie:
-        return jsonify(Data=calorie.serialize)
+        return jsonify(Data=[calorie.serialize])
     else:
         response = make_response(json.dumps('Internal server error'), 500)
         response.headers['Content-Type'] = 'application/json'
@@ -371,7 +373,7 @@ def delete_calorie():
     if request.args.get("calorie_id") and \
         len(request.args.get("calorie_id")) > 0:
 
-        calorie_id = int(request.data["calorie_id"])
+        calorie_id = int(request.args.get("calorie_id"))
         DataManager.delete_calorie(calorie_id)
         return jsonify({"Message": "Deleted calorie " + calorie_id})
     else:
@@ -547,24 +549,3 @@ def gdisconnect():
         discon_result['message'] = 'Disconnected from Google'
 
     return discon_result
-
-'''
-to incluce, possibly
-def write_tables_to_json(path):
-    """Write all of the tables in the database to .json files
-    in the specified directory.
-    """
-    table_json_endpoints = [{'func':user_type_json, 'name':'UserType'},
-                            {'func':user_json, 'name':'User'},
-                            {'func':calorie_json, 'name':'Calorie'}]
-
-    for table in table_json_endpoints:
-        func = table['func']
-        response = func()
-        data = response.data
-        name = func.__name__
-        name = name[:-4]
-        file = open(path+table['name']+'.json', 'w')
-        file.write(data)
-        file.close()
-'''

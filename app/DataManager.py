@@ -67,7 +67,8 @@ def add_user_type(name, CRUD_self, CRUD_users, CRUD_all):
     """
     session = get_calorie_db_session()
 
-    user_type = UserType(name, CRUD_self, CRUD_users, CRUD_all)
+    user_type = UserType(name=name, CRUD_self=CRUD_self, 
+        CRUD_users=CRUD_users, CRUD_all=CRUD_all)
 
     session.add(user_type)
     session.flush()
@@ -75,7 +76,7 @@ def add_user_type(name, CRUD_self, CRUD_users, CRUD_all):
     session.commit()
     session.close()
 
-    return user_id    
+    return user_type_id    
 
 
 def add_calorie(user_id, date, time, text, num_calories):
@@ -92,7 +93,13 @@ def add_calorie(user_id, date, time, text, num_calories):
     """
     session = get_calorie_db_session()
 
-    calorie = Calorie(user_id, date, time, text, num_calories)
+    print user_id
+    print date
+    print time
+    print text
+    print num_calories
+    calorie = Calorie(user_id=user_id, date=date, time=time, text=text, 
+        num_calories=num_calories)
 
     session.add(calorie)
     session.flush()
@@ -100,7 +107,7 @@ def add_calorie(user_id, date, time, text, num_calories):
     session.commit()
     session.close()
 
-    return calorie   
+    return calorie_id
 
 
 def get_user(user_id=None, username=None, email=None):

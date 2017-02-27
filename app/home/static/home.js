@@ -100,38 +100,20 @@ var ccapp = angular.module("ccapp", []);
             }
         };
 
-        // set the current calories with calories from the server
+        // resets current calories with calories from the server
         $scope.setCalsFromServer = function (data) {
 
             $scope.curr_cals = [];
-
-            for (var i = 0; i < data.length; i++) {
-                $scope.curr_cals.push({
-                    id: data[i].data.calorie_id,
-                    user_id: data[i].data.user_id,
-                    date: data[i].data.date,
-                    time: data[i].data.time,
-                    amnt: data[i].data.num_calories,
-                    text: data[i].data.text
-                });           
-            }
+            $scope.pushCalsFromServer(data);
         };
 
+        // reset current users with users from server
         $scope.setUsersFromServer = function (data) {
 
             /*
-            $scope.curr_cals = [];
-
-            for (int i = 0; i < data.length; i ++) {
-                $scope.curr_cals.push({
-                    id: data.data.calorie_id,
-                    user_id: data.data.user_id,
-                    date: data.data.date,
-                    time: data.data.time,
-                    amnt: data.data.num_calories,
-                    text: data.data.text
-                });           
-            }*/
+            $scope.curr_users = [];
+            $scope.pushUsersFromServer(data);           
+            */
         };
 
         /* calorie view functions */
@@ -205,16 +187,37 @@ var ccapp = angular.module("ccapp", []);
         $scope.postCalorie = function() {
 
             if ($scope.addingCalorie) {
-                $scope.addCalorie();
+                $scope.addCalorie($scope.pushCalorie);
             }
             else if ($scope.editingCalorie) {
-                $scope.editCalorie();
+                $scope.editCalorie($scope.pushCalorie);
             }
         };
 
         // do ajax call to add calorie to server database
-        $scope.addCalorie = function() {
+        $scope.addCalorie = function(callback) {
 
+            // TO-DO:loading graphic
+            var user_id = $scope.log_user.id;
+            var date = $scope.post_cal.date;
+            var time = $scope.post_cal.time;
+            var text = $scope.post_cal.text;
+            var amnt = $scope.post_cal.amnt;
+
+            $http({
+                method:'POST',
+                url: "/add_calorie?user_id="+user_id+"&date="+date+"&time="+time+"&text="+text+"&amnt="+amnt,
+                headers: {
+                   'Content-Type': 'application/json;charset=utf-8'
+                }
+            })
+            .then(function(resp){
+                console.log(resp);
+                callback(resp.data);
+            },function(error){
+                console.log('There was an error adding calories to the server');
+                console.log(error);
+            });
         };
 
         // do ajax call to edit calorie in server database
@@ -225,6 +228,36 @@ var ccapp = angular.module("ccapp", []);
         // do ajax call to delete a calorie from server database
         $scope.deleteCalorie = function() {
 
+        };
+
+        // push calories from server to the current calorie list
+        $scope.pushCalsFromServer = function(data) {
+
+            for (var i = 0; i < data.length; i++) {
+                $scope.curr_cals.push({
+                    id: data[i].data.calorie_id,
+                    user_id: data[i].data.user_id,
+                    date: data[i].data.date,
+                    time: data[i].data.time,
+                    amnt: data[i].data.num_calories,
+                    text: data[i].data.text
+                });           
+            }
+        };
+
+        // push users from server to the current user list
+        $scope.pushUsersFromServer = function(data) {
+            /*
+            for (var i = 0; i < data.length; i++) {
+                $scope.curr_cals.push({
+                    id: data[i].data.calorie_id,
+                    user_id: data[i].data.user_id,
+                    date: data[i].data.date,
+                    time: data[i].data.time,
+                    amnt: data[i].data.num_calories,
+                    text: data[i].data.text
+                });           
+            }*/
         };
 
         $scope.getCalories = function(data, callback) {
