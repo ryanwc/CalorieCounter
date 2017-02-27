@@ -7,7 +7,7 @@ from app import DataManager, ccapp, utils
 
 from oauth2client.client import FlowExchangeError
 
-import httplib2, requests, traceback, json
+import httplib2, requests, traceback, json, datetime
 
 api_bp = Blueprint('api', __name__)
 Api(ccapp)
@@ -16,8 +16,8 @@ CORS(ccapp)
 
 # data access endpoints
 
-@ccapp.route('/user_type/', methods=['GET'])
-def user_type_json():
+@ccapp.route('/user_type', methods=['GET', 'POST'])
+def user_type():
     """JSON endpoint for serving user type data from the database.
     """
     #data = DataManager.getData()
@@ -25,8 +25,8 @@ def user_type_json():
     #return jsonify(Data=[i.serialize for i in data])
 
 
-@ccapp.route('/user/id=<int:user_id>', methods=['GET'])
-def user_json(user_id):
+@ccapp.route('/user', methods=['GET', 'POST'])
+def user():
     """JSON endpoint for serving user data from the database.
     """
     #data = DataManager.getData(id)
@@ -34,12 +34,11 @@ def user_json(user_id):
     #return jsonify(Data=data.serialize)
 
 
-@ccapp.route('/calorie/id=<int:calorie_id>+user_id=<int:calorie_id>+date_from=<int:date_from>+date_to=<int:date_to>+time_from=<int:time_from>+time_to=<int:time_time>/', 
-        methods=['GET'])
-def get_calorie(calorie_id, user_id, date_from, date_to, time_from, time_to):
+@ccapp.route('/calorie', methods=['GET', 'POST'])
+def calorie():
     """Endpoint for serving calorie records from the database.
 
-    Args:
+    Args that can be sent as part of http query string:
         calorie_id: the id of the calorie to get
         user_id: the user id of the calorie's owner
         date_from: the beginning date of the range of calories to get
@@ -50,33 +49,41 @@ def get_calorie(calorie_id, user_id, date_from, date_to, time_from, time_to):
         A JSON representing the database version(s) of the calorie(s) specified
         by the given arguments
     """
-    if len(calorie_id) > 1:
-        calorie_id = int(calorie_id)
+    print request.args
+
+    if request.args.get("calorie_id") and \
+        len(request.args.get("calorie_id")) > 0:
+        calorie_id = int(request.data["calorie_id"])
     else:
         calorie_id = None
 
-    if len(user_id) > 1:
-        user_id = int(user_id)
+    if request.args.get("user_id") and \
+        len(request.args.get("user_id")) > 0:
+        user_id = int(request.data["user_id"])
     else:
-        user_id = None      
+        user_id = None    
 
-    if len(date_from) > 1:
-        date_from = datetime.date(date_from)
+    if request.args.get("date_from") and \
+        len(request.args.get("date_from")) > 0:
+        date_from = request.data["date_from"]
     else:
         date_from = datetime.date.min
 
-    if len(date_to) > 1:
-        date_to = datetime.date(date_to)
+    if request.args.get("date_to") and \
+        len(request.args.get("date_to")) > 0:
+        date_to = request.data["date_to"]
     else:
-        date_from = datetime.date.max
+        date_to = datetime.date.max
 
-    if len(time_from) > 1:
-        time_from = datetime.time(time_from)
+    if request.args.get("time_from") and \
+        len(request.args.get("time_from")) > 0:
+        time_from = request.data["time_from"]
     else:
         time_from = datetime.time.min
 
-    if len(time_to) > 1:
-        time_to = datetime.time(time_to)
+    if request.args.get("time_to") and \
+        len(request.args.get("time_to")) > 0:
+        time_to = request.data["time_to"]
     else:
         time_to = datetime.time.max
 
@@ -85,26 +92,16 @@ def get_calorie(calorie_id, user_id, date_from, date_to, time_from, time_to):
         time_from=time_from, time_to=time_to)
 
     print calorie
+    if id in calorie:
+        # single result
+        return jsonify(Data=calorie.serialize)
+    elif len(calorie) > 0:
+        # multiple results
+        return jsonify(Data=[i.serialize for i in calorie])
+    else:
+        # no results, return empty list
+        return jsonify(calorie)
 
-    return jsonify(Data=calorie.serialize)
-
-@ccapp.route('/calorie/id=<int:calorie_id>+user_id=<int:calorie_id>+date_from=<int:date_from>+date_to=<int:date_to>+time_from=<int:time_from>+time_to=<int:time_time>/', 
-        methods=['GET'])
-def edit_calorie(calorie_id, user_id, date_from, date_to, time_from, time_to):
-    """Endpoint for editing calorie records in the database.
-    """
-    #data = DataManager.getData(id)
-
-    #return jsonify(Data=data.serialize)
-
-@ccapp.route('/calorie/user_id=<int:calorie_id>+date_from=<int:date_from>+date_to=<int:date_to>+time_from=<int:time_from>+time_to=<int:time_time>/', 
-        methods=['GET'])
-def create_calorie(user_id, date_from, date_to, time_from, time_to):
-    """Endpoint for creating calorie records in the database.
-    """
-    #data = DataManager.getData(id)
-
-    #return jsonify(Data=data.serialize)
 
 # login/logout endpoints
 
@@ -173,11 +170,14 @@ def gconnect():
     # check to see if the google account is already logged into the system
     if ('gplus_id' in login_session and
         login_session['gplus_id'] == gplus_id):
-        response = make_response(json.\
-            dumps("Current user is already connected."), 200)
-        response.headers['Content-Type'] = 'application/json'
+        # if so just return their credentials
 
-        return response
+        return jsonify({'username': login_session['username'],
+                    'user_id': login_session['user_id'],
+                    'user_type': login_session['user_type_id'],
+                    'email': login_session['email'],
+                    'exp_cal': login_session['exp_cal'],
+                    'Access-Control-Allow-Origin': '*'})
     
     # store relevant credentials
     login_session['credentials'] = access_token

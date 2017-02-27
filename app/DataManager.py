@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 
 from database_setup import (Base, User, UserType, Calorie)
 
-from datetime import date, time
+import datetime
 
 import psycopg2 
 
@@ -186,24 +186,24 @@ def get_calorie(calorie_id=None, user_id=None, user_type=None,
         calorie = session.query(Calorie).filter_by(id=calorie_id).first()
     elif user_id:
         calorie = session.query(Calorie).\
-            filter_by(user_id=user_id).\
-            filter_by(date_from >= date_from).\
-            filter_by(date_from <= date_to).\
-            filter_by(time_from >= time_from).\
-            filter_by(time_to <= time_to).all()
+            filter(Calorie.user_id == user_id,
+                   Calorie.date >= date_from,
+                   Calorie.date <= date_to,
+                   Calorie.time >= time_from,
+                   Calorie.time <= time_to).all()
     elif user_type:
         calorie = session.query(Calorie).\
-            filter_by(user_type_id=user_type_id).\
-            filter_by(date_from >= date_from).\
-            filter_by(date_from <= date_to).\
-            filter_by(time_from >= time_from).\
-            filter_by(time_to <= time_to).all()
+            filter(Calorie.user_type_id == user_type_id,
+                   Calorie.date >= date_from,
+                   Calorie.date <= date_to,
+                   Calorie.time >= time_from,
+                   Calorie.time <= time_to).all()
     else:
         calorie = session.query(Calorie).\
-            filter_by(date_from >= date_from).\
-            filter_by(date_from <= date_to).\
-            filter_by(time_from >= time_from).\
-            filter_by(time_to <= time_to).all()
+            filter(Calorie.date >= date_from,
+                   Calorie.date <= date_to,
+                   Calorie.time >= time_from,
+                   Calorie.time <= time_to).all()
 
     session.close()
     return calorie

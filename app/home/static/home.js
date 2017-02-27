@@ -65,13 +65,47 @@ var ccapp = angular.module("ccapp", []);
         $scope.editingCalorie = false;
 
 
+        /* permissions determiner functions */
+
+        $scope.canCRUDSelf = function() {
+            return $scope.log_user.user_type == 1 || 
+                   $scope.log_user.user_type == 2 || 
+                   $scope.log_user.user_type == 3;
+        }
+
+        $scope.canCRUDUsers = function() {
+            return $scope.log_user.user_type == 2 || 
+                   $scope.log_user.user_type == 3;
+        }
+
+        $scope.canCRUDAll = function() {
+            return $scope.log_user.user_type == 3;
+        }
+
         /* object functions */
+
+        // sets the total data available to views by user type
+        // makes ajax calls to get the data
+        $scope.setTotalDataByUser = function() {
+            if ($scope.canCRUDAll()) {
+                $scope.getUsers({}, $scope.setUsersFromServer);
+                $scope.getCalories({}, $scope.setCalsFromServer);
+            }
+            else if ($scope.canCRUDUsers()) {
+                $scope.getUsers({}, $scope.setUsersFromServer);
+                $scope.getCalories({user_id:$scope.log_user.id}, $scope.setCalsFromServer);
+            }
+            else if ($scope.canCRUDSelf()) {
+                $scope.getCalories({user_id: $scope.log_user.id}, $scope.setCalsFromServer);
+            }
+        }
+
         // set the current calories with calories from the server
         $scope.setCalsFromServer = function (data) {
 
             $scope.curr_cals = [];
 
-            for (int i = 0; i < data.length; i++) {
+            for (var i = 0; i < data.length; i++) {
                 $scope.curr_cals.push({
                     id: data[i].data.calorie_id,
                     user_id: data[i].data.user_id,
@@ -192,14 +226,42 @@ var ccapp = angular.module("ccapp", []);
 
         }   
 
+        $scope.getCalories = function(data, callback) {
+
+            // TO-DO:loading graphic
+
+            console.log(data);
+
+            var calorie_id = data.hasOwnProperty(calorie_id) ? data.calorie_id : "";
+            var user_id = data.hasOwnProperty(user_id) ? data.user_id : "";
+            var date_from = data.hasOwnProperty(date_from) ? data.date_from : "";
+            var date_to = data.hasOwnProperty(date_to) ? data.date_to : "";
+            var time_from = data.hasOwnProperty(time_from) ? data.time_from : "";
+            var time_to = data.hasOwnProperty(time_to) ? data.time_to : "";
+
+            $http({
+                method:'GET',
+                url: '/calorie?id='+calorie_id+'&user_id='+user_id+"&date_from="+date_from+"&date_to="+date_to+"&time_from="+time_from+"&time_to="+time_to,
+                headers: {
+                   'Content-Type': 'application/json;charset=utf-8'
+                }
+            })
+            .then(function(resp){
+                console.log(resp);
+                callback(resp.data);
+            },function(error){
+                console.log('There was an error retrieving calories from the server: ' + error);
+            });
+        }
+
         /* user view functions */
         
         // set the currently selected user to the given user
-        $scope.setCRUDUserInfo = function(data) {
-            $scope.crud_user_id = data.data.user_id;
-            $scope.crud_username = data.data.username;
-            $scope.crud_user_type = data.data.user_type;
-            $scope.crud_exp_cal = data.data.exp_cal;
+        $scope.setCRUDUserInfo = function(isClear, data) {
+            $scope.crud_user_id = isClear ? "" : data.data.user_id;
+            $scope.crud_username = isClear ? "" : data.data.username;
+            $scope.crud_user_type = isClear ? "" : data.data.user_type;
+            $scope.crud_exp_cal = isClear ? "" : data.data.exp_cal;
         }
 
         $scope.toggleUserView = function(isShow) {
@@ -209,33 +271,19 @@ var ccapp = angular.module("ccapp", []);
         $scope.toggleUserView = function(isShow) {
 
         }    
-
-        /* permissions determiner functions */
-
-        $scope.canCRUDSelf = function() {
-            return $scope.user_type == 1 || $scope.user_type == 2 || $scope.user_type == 3;
-        }
-
-        $scope.canCRUDUsers = function() {
-            return $scope.user_type == 2 || $scope.user_type == 3;
-        }
-
-        $scope.canCRUDAll = function() {
-            return $scope.user_type == 3;
-        }
 
         /* signin/out functions */
 
         // set the logged in user to the given user
-        $scope.setLoggedInUserInfo = function(data) {
-            $scope.log_user_id = data.data.user_id;
-            $scope.log_username = data.data.username;
-            $scope.log_user_type = data.data.user_type;
-            $scope.log_exp_cal = data.data.exp_cal;
+        $scope.setLoggedInUserInfo = function(isClear, data) {
+            $scope.log_user.id = isClear ? "" : data.data.user_id;
+            $scope.log_user.username = isClear ? "" : data.data.username;
+            $scope.log_user.user_type = isClear ? "" : data.data.user_type;
+            $scope.log_user.exp_cal = isClear ? "" : data.data.exp_cal;
         };
 
         $scope.isSignedIn = function() {
-            return $scope.log_username.length > 0;
+            return $scope.log_user.username.length > 0;
         };
 
         // handle server OAuth ajax call with auth code from Google 
@@ -254,7 +302,8 @@ var ccapp = angular.module("ccapp", []);
             })
             .then(function(resp){
                 console.log(resp);
-                $scope.setLoggedInUserInfo(resp);
+                $scope.setLoggedInUserInfo(false, resp);
+                $scope.setTotalDataByUser();
             },function(error){
                 console.log(error);
                 console.log('There was an error: ' + authResult['error']);

@@ -40,11 +40,10 @@
 		<div class="outerdiv" id="controldiv">
 
 			<div class="list signedIn-//isSignedIn//" ng-show="isSignedIn()">
-				<h1>You are signed in as //username//.</h1>
 				<p>Options:</p>
-				<a href="toggleProfileView(true)" ng-show="canCRUDSelf()">View/edit your profile></a>
+				<a href="toggleProfileView(true)" ng-show="canCRUDSelf()">View / edit your profile</a>
 				<br>
-				<a href="toggleCalorieView(true)" ng-show="canCRUDSelf()">View/edit/modify/delete your calories</a>
+				<a href="toggleCalorieView(true)" ng-show="canCRUDSelf()">View / edit / modify / delete your calories</a>
 				<br>
 				<a href="toggleUserView(true)" ng-show="canCRUDUsers()">Manage users <span ng-show="canCRUDAll()">and calorie records</span></a>
 			</div>
@@ -110,10 +109,8 @@
 		each time visit login page // useful for debugging, not so in production -->
 		<div class="outerdiv" id="signindiv">
 			<div class='signedIn-//isSignedIn()//' ng-show="isSignedIn()">
-				<span id='signInMessage'>Signed in as </span>
+				<span id='signInMessage'>Signed in as //log_user.username//</span>
 				<br>
-				<a class="crud read edit delete" id="profileCRUD"
-	               href="">View/edit your profile</a>
 		    	<div class="signOut">
 		    		<a class="backLink" href="#" ng-submit="signOut()">Sign out</a>
 		    	</div>
