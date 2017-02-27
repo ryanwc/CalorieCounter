@@ -227,12 +227,25 @@ def get_calorie():
         user_id=user_id, date_from=date_from, date_to=date_to, 
         time_from=time_from, time_to=time_to)
 
+    # if results, set daytotal and whether the calorie falls on passing day
     if id in calorie:
         # single result
-        return jsonify(Data=[calorie.serialize])
+        (daytotal, meets) = utils.pass_fail_cal(calorie)
+        sCal = calorie.serialize
+        sCal["daytotal"] = daytotal
+        sCal["meets"] = meets
+        utils.pass_fail_cal(calorie)
+        return jsonify(Data=[sCal])
     elif len(calorie) > 0:
         # multiple results
-        return jsonify(Data=[i.serialize for i in calorie])
+        sCals = []
+        for cal in calorie:
+            (daytotal, meets) = utils.pass_fail_cal(cal)
+            sCal = cal.serialize
+            sCal["daytotal"] = daytotal
+            sCal["meets"] = meets
+            sCals.append(sCal)
+        return jsonify(Data=sCals)
     else:
         # no results, return empty list
         return jsonify(calorie)

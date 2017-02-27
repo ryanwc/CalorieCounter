@@ -5,6 +5,21 @@ from . import ccapp, DataManager
 import bleach, json, re
 
 
+def pass_fail_cal(calorie):
+    """Determine whether this is a pass or fail calorie based on
+    the user's daily calorie limit.
+    """
+    # get total for cal's day
+    user = DataManager.get_user(user_id=calorie.user_id)
+    cals_on_day = DataManager.get_calorie(user_id=user.id, 
+        date_from=calorie.date, date_to=calorie.date)
+    daytotal = 0
+    for cal in cals_on_day:
+        daytotal += cal.num_calories
+
+    # (met if no exp_total set)
+    return daytotal, daytotal <= user.exp_cal_day or user.exp_cal_day == 0
+
 def is_logged_in():
     """Return true if the user is logged in, false otherwise.
     """
