@@ -82,8 +82,8 @@ class Calorie(Base):
                 return {
                         'id': self.id,
                         'user_id': self.user_id,
-                        'date': self.date,
-                        'time': self.time,
+                        'date': self.date.isoformat(),
+                        'time': self.time.isoformat(),
                         'text': self.text,
                         'num_calories': self.num_calories,
                 }

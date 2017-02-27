@@ -67,7 +67,7 @@
 					<br>
 					<span class="attridentifier">Date: </span><input type="date" ng-model="post_cal.date">
 					<br> 
-					<span class="attridentifier">Time: </span><input type="time" ng-model="post_cal.time">
+					<span class="attridentifier">Time: </span><input type="range" max="24" min="0" step="1" ng-model="post_cal.time">
 					<br>
 					<span class="attridentifier">Number of calories: </span><input type="text" ng-model="post_cal.amnt">
 					<br>
@@ -90,7 +90,7 @@
 					<button type="button" ng-click="toggleViewCalories(true)" ng-show="canCRUDSelf()">View / edit / modify / delete your calories</button>
 					<br>
 					<button type="button" ng-click="toggleViewUsers(true)" ng-show="canCRUDUsers()">Manage users <span ng-show="canCRUDAll()">and calorie records</span></button>
-			    	<button type="button" ng-click="signOut()">Sign out</button>
+			    	<button type="button" ng-click="signout()">Sign out</button>
 			    </div>
 			</div>
 			<div class="signedIn-//!isSignedIn()//" ng-show="!isSignedIn()" id="signInButton">

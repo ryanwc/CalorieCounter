@@ -187,19 +187,21 @@ var ccapp = angular.module("ccapp", []);
         $scope.postCalorie = function() {
 
             if ($scope.addingCalorie) {
-                $scope.addCalorie($scope.pushCalorie);
+                $scope.addCalorie($scope.pushCalsFromServer);
             }
             else if ($scope.editingCalorie) {
-                $scope.editCalorie($scope.pushCalorie);
+                $scope.editCalorie($scope.pushCalsFromServer);
             }
         };
 
         // do ajax call to add calorie to server database
+        // pass list of calories from server to callback
         $scope.addCalorie = function(callback) {
 
             // TO-DO:loading graphic
             var user_id = $scope.log_user.id;
-            var date = $scope.post_cal.date;
+            var dates = new Date($scope.post_cal.date);
+            var date = dates.getFullYear() + "-" + (dates.getMonth()+1) + "-" + dates.getDate();
             var time = $scope.post_cal.time;
             var text = $scope.post_cal.text;
             var amnt = $scope.post_cal.amnt;
@@ -213,7 +215,7 @@ var ccapp = angular.module("ccapp", []);
             })
             .then(function(resp){
                 console.log(resp);
-                callback(resp.data);
+                callback(resp.data["Data"]);
             },function(error){
                 console.log('There was an error adding calories to the server');
                 console.log(error);
@@ -234,13 +236,15 @@ var ccapp = angular.module("ccapp", []);
         $scope.pushCalsFromServer = function(data) {
 
             for (var i = 0; i < data.length; i++) {
+                console.log("pushing:");
+                console.log(data[i]);
                 $scope.curr_cals.push({
-                    id: data[i].data.calorie_id,
-                    user_id: data[i].data.user_id,
-                    date: data[i].data.date,
-                    time: data[i].data.time,
-                    amnt: data[i].data.num_calories,
-                    text: data[i].data.text
+                    id: data[i].id,
+                    user_id: data[i].user_id,
+                    date: data[i].date,
+                    time: data[i].time,
+                    amnt: data[i].num_calories,
+                    text: data[i].text
                 });           
             }
         };
@@ -250,16 +254,17 @@ var ccapp = angular.module("ccapp", []);
             /*
             for (var i = 0; i < data.length; i++) {
                 $scope.curr_cals.push({
-                    id: data[i].data.calorie_id,
-                    user_id: data[i].data.user_id,
-                    date: data[i].data.date,
-                    time: data[i].data.time,
-                    amnt: data[i].data.num_calories,
-                    text: data[i].data.text
+                    id: data[i].calorie_id,
+                    user_id: data[i].user_id,
+                    date: data[i].date,
+                    time: data[i].time,
+                    amnt: data[i].num_calories,
+                    text: data[i].text
                 });           
             }*/
         };
 
+        // get list of calories from server, pass to callback
         $scope.getCalories = function(data, callback) {
 
             // TO-DO:loading graphic
@@ -282,7 +287,7 @@ var ccapp = angular.module("ccapp", []);
             })
             .then(function(resp){
                 console.log(resp);
-                callback(resp.data);
+                callback(resp.data["Data"]);
             },function(error){
                 console.log('There was an error retrieving calories from the server: ' + error);
             });
@@ -346,24 +351,23 @@ var ccapp = angular.module("ccapp", []);
 
         $scope.signout = function(forUserDeletion=0) {
             // TO-DO: update this method
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (xhttp.readyState == 4 && xhttp.status == 200) {
-                    window.alert(xhttp.responseText);
-                    if (forUserDeletion == 1) {
-                        // returns to delete form onsubmit so lets deletion proceed
-                        return true;
-                    }
-                    else {
-                        location.reload();
-                    }
+
+            $http({
+                method:'POST',
+                url: '/gdisconnect',
+                headers: {
+                   'Content-Type': 'application/json;charset=utf-8'
                 }
-                else if (forUserDeletion == 1) {
-                    return false;
-                }
-            }
-            xhttp.open("POST", "/disconnect", true);
-            xhttp.send();
+            })
+            .then(function(resp){
+                console.log(resp);
+                $scope.setLoggedInUserInfo(true, resp);
+                $scope.toggleViewCalories(false);
+                window.alert("Logged out");
+            },function(error){
+                console.log('There was an error disconnecting');
+                console.log(error);
+            });
         };
     });
 })(ccapp);

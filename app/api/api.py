@@ -173,10 +173,14 @@ def get_calorie():
     Args that can be sent as part of http query string:
         calorie_id: the id of the calorie to get
         user_id: the user id of the calorie's owner
-        date_from: the beginning date of the range of calories to get
-        date_to: the ending date of the range of calories to get
-        time_from: the beginning time of the range of calories to get
+        date_from: the beginning date of the range of calories to get.
+            must be given in 'YYYY-MM-DD' format
+        date_to: the ending date of the range of calories to get.
+            must be given in 'YYYY-MM-DD' format
+        time_from: the beginning time of the range of calories to get.
+            must be given as an hour, from 0 <= h <= 24
         time_to: the ending time of the range of calories to get
+            must be given as an hour, from 0 <= h <= 24
     Return:
         A JSON representing the database version(s) of the calorie(s) specified
         by the given arguments
@@ -195,25 +199,27 @@ def get_calorie():
 
     if request.args.get("date_from") and \
         len(request.args.get("date_from")) > 0:
-        date_from = request.args.get("date_from")
+        dates = request.args.get("date_from").split("-")
+        date_from = datetime.date(int(dates[0]), int(dates[1]), int(dates[2]))
     else:
         date_from = datetime.date.min
 
     if request.args.get("date_to") and \
         len(request.args.get("date_to")) > 0:
-        date_to = request.args.get("date_to")
+        dates = request.args.get("date_to").split("-")
+        date_to = datetime.date(int(dates[0]), int(dates[1]), int(dates[2]))
     else:
         date_to = datetime.date.max
 
     if request.args.get("time_from") and \
         len(request.args.get("time_from")) > 0:
-        time_from = request.args.get("date_to")
+        time_from = datetime.time(int(request.args.get("time_from")))
     else:
         time_from = datetime.time.min
 
     if request.args.get("time_to") and \
         len(request.args.get("time_to")) > 0:
-        time_to = request.args.get("time_to")
+        time_to = datetime.time(int(request.args.get("time_to")))
     else:
         time_to = datetime.time.max
 
@@ -237,8 +243,8 @@ def add_calorie():
 
     Args that can be sent as part of http query string:
         user_id: the calorie's user id
-        date: the calorie's date
-        time: the calorie's time
+        date: the calorie's date. must be given in 'YYYY-MM-DD' format
+        time: the calorie's time. must be given as an hour, from 0 <= h <= 24
         text: the calorie's description
         amnt: the new number of calories
     Return:
@@ -256,7 +262,8 @@ def add_calorie():
 
     if request.args.get("date") and \
         len(request.args.get("date")) > 0:
-        date = request.args.get("date")
+        dates = request.args.get("date").split("-")
+        date = datetime.date(int(dates[0]), int(dates[1]), int(dates[2]))
     else:
         response = make_response(json.dumps('Must provide valid date'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -264,7 +271,7 @@ def add_calorie():
 
     if request.args.get("time") and \
         len(request.args.get("time")) > 0:
-        time = request.args.get("time")
+        time = datetime.time(int(request.args.get("time")))
     else:
         response = make_response(json.dumps('Must provide valid time'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -274,7 +281,7 @@ def add_calorie():
         len(request.args.get("text")) > 0:
         text = request.args.get("text")
     else:
-        response = make_response(json.dumps('Must provide valid time'), 401)
+        response = make_response(json.dumps('Must provide valid text'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response  
 
@@ -304,8 +311,8 @@ def edit_calorie():
     Args that can be sent as part of http query string:
         calorie_id: the id of the calorie to edit
         user_id: the new user id
-        date: the new date
-        time: the new time
+        date: the new date. must be given in 'YYYY-MM-DD' format
+        time: the new time. must be given as an hour, from 0 <= h <= 24
         text: the new description
         num_calories: the new number of calories
     Return:
@@ -327,13 +334,14 @@ def edit_calorie():
 
     if request.args.get("date") and \
         len(request.args.get("date")) > 0:
-        date = request.args.get("date")
+        dates = request.args.get("date").split("-")
+        date = datetime.date(int(dates[0]), int(dates[1]), int(dates[2]))
     else:
         date = None
 
     if request.args.get("time") and \
         len(request.args.get("time")) > 0:
-        time = request.args.get("time")
+        time = datetime.time(int(request.args.get("time")))
     else:
         time = None
 
@@ -548,4 +556,4 @@ def gdisconnect():
         discon_result['success'] = True
         discon_result['message'] = 'Disconnected from Google'
 
-    return discon_result
+    return jsonify(discon_result)
