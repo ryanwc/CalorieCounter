@@ -12,6 +12,20 @@ li {
 	margin-left: 5px;
 }
 
+.mainviewdiv {
+	left: 50%;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	max-height: 500px;
+	max-width: 515px;
+	margin-left: auto;
+	margin-right: auto;
+	border: 1px solid black;
+	border-radius: 5px;
+}
+
 .crud {
 	color: #c299ff;
 }
@@ -94,40 +108,10 @@ li {
 	font-size: .85em;
 }
 
-#controldiv	{
-	left: 50%;
-	padding-left: 15px;
-	padding-right: 15px;
-	padding-top: 5px;
-	padding-bottom: 5px;
-	max-height: 500px;
-	max-width: 515px;
-	margin-left: auto;
-	margin-right: auto;
-	border: 1px solid;
-	border-radius: 5px;
+#calorieldiv {
 	border-color: #262626;
 	background-color: #8000ff;
 }
-
-#mainviewdiv {
-	left: 50%;
-	padding-left: 15px;
-	padding-right: 15px;
-	padding-top: 5px;
-	padding-bottom: 5px;
-	max-height: 500px;
-	max-width: 515px;
-	margin-left: auto;
-	margin-right: auto;
-}
-#mainview {
-	height: 100%;
-	width: 100%;
-	max-height: 500px;
-	border: 1px solid black;
-}
-
 #calorielistdiv {
 
 }
@@ -139,13 +123,19 @@ li {
 	padding-left: 15px;
 	padding-right: 15px;
 	padding-top: 2px;
+	height: 50px;
 	padding-bottom: 2px;
-	height: 35px;
 	border: 1px solid black;
 	overflow-y: scroll;
 }
-				 
-#signindiv	{
+#singlecaloriediv {
+
+}
+#postcaloriediv {
+	
+}
+
+#controldiv	{
 	left: 50%;
 	padding-left: 15px;
 	padding-right: 15px;

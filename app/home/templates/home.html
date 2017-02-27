@@ -36,86 +36,71 @@
 				{% endif %}
 			{% endwith %}
 		</div>
+		
+		<!-- extension: sub angular views in and out based on controldiv selections -->
+		<div class="outerdiv mainviewdiv" id="caloriediv" ng-show="viewingCalories">
+
+			<div id="calorielistdiv">
+				<span id="calorielistheader">Click a calorie to view details or <button type="button" ng-click="togglePostCalorie(true, true)">add a new calorie</button></span>
+				<div id="calorielistlist" ng-repeat="cal in curr_cals">
+			      	<button class="calbutton" id="cal-//cal.id//" type="button" ng-click="toggleViewCalorie(true, cal.id)">Date: //cal.date//; Amount: //cal.amnt//</button>
+			      	<br>
+			    </div>
+			</div>
+
+			<div id="singlecaloriediv" ng-show="viewingCalorie">
+		      	<span>Date: <span ng-model="curr_cal.date"></span></span>
+		      	<br>
+		      	<span>Time: <span ng-model="curr_cal.time"></span></span>
+		      	<br>
+		      	<span>Amount: <span ng-model="curr_cal.amnt"></span></span>
+		      	<br>
+		      	<span>Text: <span ng-model="curr_cal.text"></span></span>
+		      	<br>
+		      	<button type="button" ng-click="togglePostCalorie(true, false)">edit calorie</button> | <form ng-submit="deleteCalorie()"><input type="submit" value="delete calorie"></form> | <button type="button" ng-click="toggleViewCalorie(false)">stop viewing calorie</button>
+			</div>
+
+			<div id="postcaloriediv" ng-show="addingCalorie || editingCalorie">
+				<form id="postcalorieform" ng-submit="postCalorie()">
+					<span class="calformheader" ng-show="addingCalorie">Add a calorie with the following info:</span>
+					<span class="calformheader" ng-show="editingCalorie">Change the calorie as desired and submit.</span>
+					<br>
+					<span class="attridentifier">Date: </span><input type="date" ng-model="post_cal.date">
+					<br> 
+					<span class="attridentifier">Time: </span><input type="time" ng-model="post_cal.time">
+					<br>
+					<span class="attridentifier">Number of calories: </span><input type="text" ng-model="post_cal.amnt">
+					<br>
+					<span class="attridentifier">Text: </span><input type="text" ng-model="post_cal.text">
+					<br>
+					<input type="submit" value="submit">
+					<button type="button" ng-click="togglePostCalorie(false, addingCalorie)">cancel</button>
+				</form>
+			</div>
+
+		</div>
+		<!-- end calorie main view -->
 
 		<div class="outerdiv" id="controldiv">
-
-			<div class="list signedIn-//isSignedIn//" ng-show="isSignedIn()">
-				<p>Options:</p>
-				<a href="toggleProfileView(true)" ng-show="canCRUDSelf()">View / edit your profile</a>
-				<br>
-				<a href="toggleCalorieView(true)" ng-show="canCRUDSelf()">View / edit / modify / delete your calories</a>
-				<br>
-				<a href="toggleUserView(true)" ng-show="canCRUDUsers()">Manage users <span ng-show="canCRUDAll()">and calorie records</span></a>
-			</div>
-
-		</div>
-
-		<div class="outerdiv" id="mainviewdiv">
-			<!-- extension: sub angular views in and out based on controldiv selections -->
-
-			<div id="caloriediv" ng-show="viewingCalories">
-
-				<div id="calorielistdiv" ng-repeat="cal in curr_cals">
-					<span id="calorielistheader">Click a calorie to view details.</span>
-					<div id="calorielistlist">
-				      	<a href="toggleViewCalorie(true)"><span>Date: //cal.date//</span>; Amount: //cal.amnt//</span></a>
-				      	<br>
-				      	<a href="toggleCaloriePost(true, true)">Add new calorie</a>
-				    </div>
-				</div>
-
-				<div id="singlecaloriediv" ng-show="viewingCalorie">
-			      	<span>Date: <span ng-model="curr_cal.date"></span></span>
-			      	<br>
-			      	<span>Time: <span ng-model="curr_cal.time"></span></span>
-			      	<br>
-			      	<span>Amount: <span ng-model="curr_cal.amnt"></span></span>
-			      	<br>
-			      	<span>Text: <span ng-model="curr_cal.text"></span></span>
-			      	<br>
-			      	<span><a href="toggleCaloriePost(true, false)">edit calorie</a> | <form ng-submit="deleteCalorie()"><input type="submit" value="delete calorie"></form> | <a href="toggleViewCalorie(false)">stop viewing calorie</a>
-			      </form>
-				</div>
-
-				<div id="postcaloriediv" ng-show="postingCalorie">
-					<form id="postcalorieform" ng-submit="postCalorie()">
-						<span class="calformheader" ng-show="addingCalorie">Add a calorie with the following info:</span>
-						<span class="calformheader" ng-show="editingCalorie">Change the calorie as desired and submit.</span>
-						<br>
-						<span class="attridentifier">Date: </span><input type="date" ng-model="postCalorieDate" ng-model="post_cal.date"> 
-						<span class="attridentifier">Time: </span><input type="time" ng-model="postCalorieTime" ng-model="post_cal.time">
-						<span class="attridentifier">Number of calories: </span><input type="text" ng-model="post_cal.amnt" ng-model="curr_cal_amnt">
-						<span class="attridentifier">Text: </span><input type="text" ng-model="postCalorieText" ng-model="post_cal.text">
-						<span class="attridentifier">Text: </span><input type="submit" value="submit">
-						<a href="toggleCaloriePost(false, addingCalorie)">cancel</a>
-					</form>
-				</div>
-
-			</div>
-			<!-- end calorie view -->
-
-		</div>
-
-	<!-- Google+ sign in button -->
-	<!-- data-scope is the data we want to have access to -->
-	<!-- data-redirect="postmessage" enables the one-time use code flow -->
-	<!-- data-accesstype="offline" lets the app access user data even when 
-		the user is offline -->
-	<!-- data-cookiepolicy determines scope of URIs that can acces the cookie -->
-	<!-- data-callback specifies a callback method 
-		(in this case when the user signs in and Google gives the one-time-use code
-		along with an access code) -->
-	<!-- data-approvalprompt="force" means user has to log in 
-		each time visit login page // useful for debugging, not so in production -->
-		<div class="outerdiv" id="signindiv">
 			<div class='signedIn-//isSignedIn()//' ng-show="isSignedIn()">
 				<span id='signInMessage'>Signed in as //log_user.username//</span>
-				<br>
-		    	<div class="signOut">
-		    		<a class="backLink" href="#" ng-submit="signOut()">Sign out</a>
-		    	</div>
+				<div id="controlbuttons">
+					<button type="button" ng-click="toggleViewProfile(true)" ng-show="canCRUDSelf()">View / edit your profile</button>
+					<br>
+					<button type="button" ng-click="toggleViewCalories(true)" ng-show="canCRUDSelf()">View / edit / modify / delete your calories</button>
+					<br>
+					<button type="button" ng-click="toggleViewUsers(true)" ng-show="canCRUDUsers()">Manage users <span ng-show="canCRUDAll()">and calorie records</span></button>
+			    	<button type="button" ng-click="signOut()">Sign out</button>
+			    </div>
 			</div>
 			<div class="signedIn-//!isSignedIn()//" ng-show="!isSignedIn()" id="signInButton">
+				<!-- Google+ sign in button -->
+				<!-- data-scope is the data we want to have access to -->
+				<!-- data-redirect="postmessage" enables the one-time use code flow -->
+				<!-- data-accesstype="offline" lets the app access user data even when the user is offline -->
+				<!-- data-cookiepolicy determines scope of URIs that can acces the cookie -->
+				<!-- data-callback specifies a callback method for when Google gives a one-time-use code along with an access code) -->
+				<!-- data-approvalprompt="force" means user has to log in each time visit login page -->
 				<div class="g-signin"
 					data-scope="openid email"
 	            	data-redirecturi="postmessage"

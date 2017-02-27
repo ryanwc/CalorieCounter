@@ -41,21 +41,21 @@ var ccapp = angular.module("ccapp", []);
             username: "",
             user_type: "",
             exp_cal: ""           
-        }
+        };
 
         $scope.post_user = {
             id: "",
             username: "",
             user_type: "",
             exp_cal: ""            
-        }
+        };
 
         $scope.log_user = {
             id: "",
             username: "",
             user_type: "",
             exp_cal: ""   
-        }
+        };
 
         /* vars related to user actions */
         $scope.viewingCalories = false;
@@ -71,16 +71,16 @@ var ccapp = angular.module("ccapp", []);
             return $scope.log_user.user_type == 1 || 
                    $scope.log_user.user_type == 2 || 
                    $scope.log_user.user_type == 3;
-        }
+        };
 
         $scope.canCRUDUsers = function() {
             return $scope.log_user.user_type == 2 || 
                    $scope.log_user.user_type == 3;
-        }
+        };
 
         $scope.canCRUDAll = function() {
             return $scope.log_user.user_type == 3;
-        }
+        };
 
         /* object functions */
 
@@ -98,7 +98,7 @@ var ccapp = angular.module("ccapp", []);
             else if ($scope.canCRUDSelf()) {
                 $scope.getCalories({user_id: $scope.log_user.id}, $scope.setCalsFromServer);
             }
-        }
+        };
 
         // set the current calories with calories from the server
         $scope.setCalsFromServer = function (data) {
@@ -145,7 +145,8 @@ var ccapp = angular.module("ccapp", []);
             $scope.curr_cal.time = isClear ? "" : data.data.time;
             $scope.curr_cal.amnt = isClear ? "" : data.data.num_calories;
             $scope.curr_cal.text = isClear ? "" : data.data.text;
-        }
+        };
+
         // toggle the total calorie view on or off
         $scope.toggleViewCalories = function(isShow) {
             if (isShow) {
@@ -155,7 +156,7 @@ var ccapp = angular.module("ccapp", []);
                 $scope.viewingCalories = false;
                 $scope.toggleViewCalorie(false);
             }
-        }   
+        };   
 
         // toggle the specific calorie view on or off
         $scope.toggleViewCalorie = function(isShow) {
@@ -164,12 +165,12 @@ var ccapp = angular.module("ccapp", []);
             }
             else {
                 $scope.viewingCalorie = false;
-                $scope.toggleCaloriePost(false, false);
+                $scope.togglePostCalorie(false, false);
             }
-        }
+        };
 
         // toggle the add/edit calorie form on or off
-        $scope.toggleCaloriePost = function(isShow, isAdd) {
+        $scope.togglePostCalorie = function(isShow, isAdd) {
 
             if (isShow) {
                 if (isAdd) {
@@ -182,23 +183,23 @@ var ccapp = angular.module("ccapp", []);
                 }
             }
             else {
-                $scope.viewingCalories = false;
                 $scope.addingCalorie = false;
                 $scope.editingCalorie = false;
                 $scope.setPostCalorie(true);
             }
-        } 
+        };
 
         // set the information for the calorie to be posted
         $scope.setPostCalorie = function(isClear) {
-
+            console.log($scope.post_cal);
             $scope.post_cal.id = isClear ? "" : $scope.curr_cal.id;
             $scope.post_cal.user_id = isClear ? "" : $scope.curr_cal.user_id;
             $scope.post_cal.date = isClear ? "" : $scope.curr_cal.date;
             $scope.post_cal.time = isClear ? "" : $scope.curr_cal.time;
             $scope.post_cal.amnt = isClear ? "" : $scope.curr_cal.amnt;
             $scope.post_cal.text = isClear ? "" : $scope.curr_cal.text;
-        }
+            console.log($scope.post_cal);
+        };
 
         // initiate ajax call to post a calorie to server database
         $scope.postCalorie = function() {
@@ -209,22 +210,22 @@ var ccapp = angular.module("ccapp", []);
             else if ($scope.editingCalorie) {
                 $scope.editCalorie();
             }
-        }
+        };
 
         // do ajax call to add calorie to server database
         $scope.addCalorie = function() {
 
-        }
+        };
 
         // do ajax call to edit calorie in server database
         $scope.editCalorie = function() {
 
-        }
+        };
 
         // do ajax call to delete a calorie from server database
         $scope.deleteCalorie = function() {
 
-        }   
+        };
 
         $scope.getCalories = function(data, callback) {
 
@@ -252,7 +253,7 @@ var ccapp = angular.module("ccapp", []);
             },function(error){
                 console.log('There was an error retrieving calories from the server: ' + error);
             });
-        }
+        };
 
         /* user view functions */
         
@@ -262,15 +263,15 @@ var ccapp = angular.module("ccapp", []);
             $scope.crud_username = isClear ? "" : data.data.username;
             $scope.crud_user_type = isClear ? "" : data.data.user_type;
             $scope.crud_exp_cal = isClear ? "" : data.data.exp_cal;
-        }
+        };
 
-        $scope.toggleUserView = function(isShow) {
+        $scope.toggleViewUsers = function(isShow) {
 
-        }    
+        };   
 
-        $scope.toggleUserView = function(isShow) {
+        $scope.toggleViewUser = function(isShow) {
 
-        }    
+        };
 
         /* signin/out functions */
 
@@ -330,7 +331,7 @@ var ccapp = angular.module("ccapp", []);
             }
             xhttp.open("POST", "/disconnect", true);
             xhttp.send();
-        }
+        };
     });
 })(ccapp);
 
