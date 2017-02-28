@@ -34,8 +34,10 @@
 				<span class="listheader"><button class="click addclick" type="button" ng-click="togglePostCalorie(true, true)">Add a calorie</button>, or click a calorie to view/edit</span>
 				<div class="listlist">
 					<span class="listitem" ng-repeat="cal in curr_cal_dict">
-			      		<button class="click calbutton" id="cal-//cal.id//" type="button" ng-click="toggleViewCalorie(true, cal.id)">Calorie //cal.id//:</button> <span>Date: //cal.date_str//; Amount: //cal.amnt//</span>
-			      		<br>
+						<span ng-if="cal.user_id == curr_user.id">
+				      		<button class="click calbutton" id="cal-//cal.id//" type="button" ng-click="toggleViewCalorie(true, cal.id)">Calorie //cal.id//:</button> <span>Date: //cal.date_str//; Amount: //cal.amnt//</span>
+				      		<br>
+			      		</span>
 			      	</span>
 			    </div>
 			</div>

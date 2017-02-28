@@ -19,7 +19,6 @@ var ccapp = angular.module("ccapp", []);
 
         $scope.curr_cal_dict = {};
         $scope.curr_user_dict = {};
-        $scope.curr_user_to_cal = {};
         $scope.user_type_dict = {};
 
         $scope.curr_cal = {
