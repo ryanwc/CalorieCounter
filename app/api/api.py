@@ -16,19 +16,13 @@ CORS(ccapp)
 
 # data access endpoints
 
-@ccapp.route('/user_type', methods=['GET', 'POST'])
+@ccapp.route('/user_type', methods=['GET'])
 def get_user_type():
     """Endpoint for serving user type records from the database.
 
     Args that can be sent as part of http query string:
-        user_type_id: A user type id
-        name: A user type name
-        CRUD_self: whether the user type(s) to get can edit its own
-        calorie entries
-        CRUD_users: whether the user type(s) to get can edit other
-        users (but not their calorie entries)
-        CRUD_all: whether the user type to get can edit all users and
-        calorie entries
+        None. This endpoint method will simply show which user types
+        are in the database.
     Return:
         A JSON representing the database version(s) of the user type(s) 
         specified by the given arguments
@@ -38,43 +32,9 @@ def get_user_type():
             dumps('Must sign in to CRUD'), 403)
         response.headers['Content-Type'] = 'application/json'
 
-    if request.args.get("user_type_id") and \
-        len(request.args.get("user_type_id")) > 0:
-        user_type_id = int(request.args.get("user_type_id"))
-    else:
-        user_type_id = None
+    user_type = DataManager.get_user_type()
 
-    if request.args.get("name") and \
-        len(request.args.get("name")) > 0:
-        name = int(request.args.get("name"))
-    else:
-        name = None    
-
-    if request.args.get("CRUD_self") and \
-        len(request.args.get("CRUD_self")) > 0:
-        CRUD_self = request.args.get("CRUD_self")
-    else:
-        CRUD_self = None
-
-    if request.args.get("CRUD_users") and \
-        len(request.args.get("CRUD_users")) > 0:
-        CRUD_users = request.args.get("CRUD_users")
-    else:
-        CRUD_users = None
-
-    if request.args.get("CRUD_all") and \
-        len(request.args.get("CRUD_all")) > 0:
-        CRUD_all = request.args.get("CRUD_all")
-    else:
-        CRUD_all = None
-
-    user_type = DataManager.get_user_type(user_type_id=user_type_id, name=name, 
-        CRUD_self=CRUD_self, CRUD_users=CRUD_users, CRUD_all=CRUD_all)
-
-    if id in user_type:
-        # single result
-        return jsonify(Data=[user_type.serialize])
-    elif len(user_type) > 0:
+    if len(user_type) > 0:
         # multiple results
         return jsonify(Data=[i.serialize for i in user_type])
     else:
@@ -82,34 +42,32 @@ def get_user_type():
         return jsonify(user_type)
 
 
+@ccapp.route('/add_user_type', methods=['POST'])
+def add_user_type():
+    """Endpoint for edint user type records from the database.
+    Currently unimplemented and unneeded. If user types need to be
+    created, updated, or deleted, the super user should change from direct 
+    connection to database.
+    """
+
+
+@ccapp.route('/edit_user_type', methods=['POST'])
+def edit_user_type():
+    """Endpoint for edint user type records from the database.
+    Currently unimplemented and unneeded. If user types need to be
+    created, updated, or deleted, the super user should change from direct 
+    connection to database.
+    """
+
 @ccapp.route('/delete_user_type', methods=['POST'])
 def delete_user_type():
     """Endpoint for deleting user type records from the database.
-
-    Args that can be sent as part of http query string:
-        user_type_id: the id of the user type to delete
-    Return:
-        A JSON representing deletion success or failure
+    Currently unimplemented and unneeded. If user types need to be
+    created, updated, or deleted, the super user should change from direct 
+    connection to database.
     """
-    if not utils.is_logged_in():
-        response = make_response(json.\
-            dumps('Must sign in to CRUD'), 403)
-        response.headers['Content-Type'] = 'application/json'
 
-    if request.args.get("user_type_id") and \
-        len(request.args.get("user_type_id")) > 0:
-
-        user_type_id = int(request.args.get("user_type_id"))
-        DataManager.delete_user(user_type_id)
-        return jsonify({"Message": "Deleted calorie " + user_type_id})
-    else:
-
-        response = make_response(json.dumps('Invalid user type id'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
-
-@ccapp.route('/user', methods=['GET', 'POST'])
+@ccapp.route('/user', methods=['GET'])
 def get_user():
     """Endpoint for serving user records from the database.
 
@@ -136,13 +94,21 @@ def get_user():
         len(request.args.get("username")) > 0:
         username = int(request.args.get("username"))
     else:
-        username = None    
+        username = None
 
     if request.args.get("email") and \
         len(request.args.get("email")) > 0:
         email = request.args.get("email")
     else:
         email = None
+
+    # check permissions
+    if not isAuthorizedUserAction(user_id, 
+            login_session["user_id"], login_session["user_type_id"]):
+        response = make_response(json.\
+            dumps('Not authorized to get other user data'), 403)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
     user = DataManager.get_user(user_id=user_id, username=username, email=email)
 
@@ -154,8 +120,77 @@ def get_user():
         return jsonify(Data=[i.serialize for i in user])
     else:
         # no results, return empty list
-        return jsonify(user)
+        return jsonify([])
 
+
+@ccapp.route('/edit_user', methods=['POST'])
+def edit_user():
+    """Endpoint for editing user records in the database.
+
+    Args that can be sent as part of http query string:
+        user_id: the id of the user to edit
+        email: the new email
+        username: the new username
+        exp_cal: the new expected calories / day
+        user_type: the new user type
+    Return:
+        A JSON representing the given user edited as specified
+    """
+    if not utils.is_logged_in():
+        response = make_response(json.\
+            dumps('Must sign in to CRUD'), 403)
+        response.headers['Content-Type'] = 'application/json'
+
+    if request.args.get("user_id") and \
+        len(request.args.get("user_id")) > 0:
+        user_id = int(request.args.get("user_id"))
+    else:
+        response = make_response(json.dumps('Must user id'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response  
+
+    if request.args.get("username") and \
+        len(request.args.get("username")) > 0:
+        username = int(request.args.get("username"))
+    else:
+        username = None    
+
+    if request.args.get("email") and \
+        len(request.args.get("email")) > 0:
+        email = request.args.get("email")
+    else:
+        email = None
+
+    if request.args.get("exp_cal") and \
+        len(request.args.get("exp_cal")) > 0:
+        exp_cal = request.args.get("exp_cal")
+    else:
+        exp_cal = None
+
+    if request.args.get("user_type") and \
+        len(request.args.get("user_type")) > 0:
+        user_type = request.args.get("user_type")
+    else:
+        user_type = None     
+
+    user = DataManager.get_user(user_id=user_id)
+
+    if not utils.isAuthorizedUserAction(user.user_id, 
+            login_session["user_id"], login_session["user_type_id"]):
+        response = make_response(json.\
+            dumps('Not authorized for actions on given user'), 403)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    DataManager.edit_user(user_id=user_id, username=username, email=email)
+    user = DataManager.get_user(user_id=user_id)
+
+    if user:
+        return jsonify(Data=[user])
+    else:
+        response = make_response(json.dumps('Internal server error'), 500)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
 @ccapp.route('/delete_user', methods=['POST'])
 def delete_user():
@@ -175,10 +210,30 @@ def delete_user():
         len(request.args.get("user_id")) > 0:
 
         user_id = int(request.args.get("user_id"))
-        DataManager.delete_user(user_id)
-        return jsonify({"Message": "Deleted calorie " + user_id})
-    else:
+        user = DataManager.get_user(user_id=user_id)
 
+        # check permissions
+        if not utils.isAuthorizedUserAction(user.user_id, 
+            login_session["user_id"], login_session["user_type_id"]):
+
+            response = make_response(json.\
+                dumps('Not authorized for actions on given user'), 403)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+        # update and return
+        result = DataManager.delete_user(user_id)
+        if result == 1:
+            return jsonify({"Message": "Successful deletion",
+                            "Post": "deletion",
+                            "Model": "user",
+                            "id": user_id})
+        else:
+            response = make_response(json.\
+                dumps('User id did not match any in db'), 401)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    else:
         response = make_response(json.dumps('Invalid user id'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -211,12 +266,27 @@ def get_calorie():
     if request.args.get("calorie_id") and \
         len(request.args.get("calorie_id")) > 0:
         calorie_id = int(request.args.get("calorie_id"))
+        # check permissions for reading this calorie
+        calorie = DataManager.get_calorie(calorie_id=calorie_id)
+        if not utils.isAuthorizedCalAction(calorie.user_id, 
+                login_session["user_id"], login_session["user_type_id"]):
+            response = make_response(json.\
+                dumps('Not authorized for cal actions for given user'), 403)
+            response.headers['Content-Type'] = 'application/json'
+            return response 
     else:
         calorie_id = None
 
     if request.args.get("user_id") and \
         len(request.args.get("user_id")) > 0:
         user_id = int(request.args.get("user_id"))
+        # check perissions for reading this user's calories
+        if not utils.isAuthorizedCalAction(user_id, 
+            login_session["user_id"], login_session["user_type_id"]):
+                response = make_response(json.\
+            dumps('Not authorized for cal actions for given user'), 403)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         user_id = None    
 
@@ -298,7 +368,8 @@ def add_calorie():
         len(request.args.get("user_id")) > 0:
 
         user_id = int(request.args.get("user_id"))
-        if not utils.isAuthorizedCalAction(user_id, login_session["user_id"]):
+        if not utils.isAuthorizedCalAction(user_id, 
+                login_session["user_id"], login_session["user_type_id"]):
             response = make_response(json.\
                 dumps('Not authorized for cal actions for given user'), 403)
             response.headers['Content-Type'] = 'application/json'
@@ -421,18 +492,18 @@ def edit_calorie():
     # check permissions
     calorie = DataManager.get_calorie(calorie_id=calorie_id)
     if not utils.isAuthorizedCalAction(calorie.user_id, 
-        login_session["user_id"]):
-            response = make_response(json.\
-                dumps('Not authorized for cal actions for given user'), 403)
-            response.headers['Content-Type'] = 'application/json'
-            return response
+            login_session["user_id"], login_session["user_type_id"]):
+        response = make_response(json.\
+            dumps('Not authorized for cal actions for given user'), 403)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
     if user_id and not utils.isAuthorizedCalAction(user_id, 
-        login_session["user_id"]):
-            response = make_response(json.\
-                dumps('Not authorized for cal actions for given user'), 403)
-            response.headers['Content-Type'] = 'application/json'
-            return response 
+            login_session["user_id"], login_session["user_type_id"]):
+        response = make_response(json.\
+            dumps('Not authorized for cal actions for given user'), 403)
+        response.headers['Content-Type'] = 'application/json'
+        return response 
 
     # make the update and return
     DataManager.edit_calorie(calorie_id, user_id=user_id, date=date,
@@ -476,7 +547,7 @@ def delete_calorie():
 
         # check permissions
         if not utils.isAuthorizedCalAction(calorie.user_id, 
-            login_session["user_id"]):
+                login_session["user_id"], login_session["user_type_id"]):
 
             response = make_response(json.\
                 dumps('Not authorized for cal actions for given user'), 403)
@@ -597,7 +668,7 @@ def gconnect():
     utils.set_session_user_info()
 
     return jsonify({'username': login_session['username'],
-                    'user_id': login_session['user_id'],
+                    'id': login_session['user_id'],
                     'user_type': login_session['user_type_id'],
                     'email': login_session['email'],
                     'exp_cal': login_session['exp_cal'],

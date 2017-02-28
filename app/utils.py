@@ -20,7 +20,7 @@ def pass_fail_cal(calorie):
     # (met if no exp_total set)
     return daytotal, daytotal <= user.exp_cal_day or user.exp_cal_day == 0
 
-def isAuthorizedCalAction(user_id, cruder_user_id):
+def isAuthorizedCalAction(user_id, cruder_user_id, cruder_user_type_id):
     """Return whether the cruder_user_id in user has permissions for calorie 
     actions on calories owned by user_id.
     """
