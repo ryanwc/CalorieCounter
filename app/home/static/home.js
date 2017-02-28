@@ -15,6 +15,8 @@ var ccapp = angular.module("ccapp", []);
     ccapp.controller("homeCtrl", function($scope, $http, $filter) {
 
         /* vars related to database info*/
+        $scope.expCalMessage = "";
+
         $scope.curr_cals = [];
         $scope.curr_cal_dict = {};
         $scope.curr_users = [];
@@ -70,6 +72,9 @@ var ccapp = angular.module("ccapp", []);
         $scope.addingCalorie = false;
         $scope.editingCalorie = false;
 
+        $scope.viewingUsers = false;
+        $scope.viewingUser = false;
+        $scope.editingUser = false;
 
         /* permissions determiner functions */
 
@@ -117,11 +122,9 @@ var ccapp = angular.module("ccapp", []);
         // reset current users with users from server
         $scope.setUsersFromServer = function (data) {
 
-            /*
             $scope.curr_users = [];
             $scope.curr_user_dict = {};
             $scope.pushUsersFromServer(data);           
-            */
         };
 
         /* calorie view functions */
@@ -145,6 +148,8 @@ var ccapp = angular.module("ccapp", []);
         $scope.toggleViewCalories = function(isShow) {
             if (isShow) {
                 $scope.viewingCalories = true;
+                $scope.toggleViewProfile(false);
+                $scope.toggleViewUsers(false);
             }
             else {
                 $scope.viewingCalories = false;
@@ -288,9 +293,12 @@ var ccapp = angular.module("ccapp", []);
                 $scope.togglePostCalorie(false);
             }
             else {
-                $scope.removeUserFromCurr();
+                $scope.editUserInCurr(data);
+                $scope.setCurrUserInfo(false, $scope.curr_user_dict[data[0].id]);
+                $scope.editingUser = false;
+                $scope.toggleEditUser(false);
             }
-        }
+        };
 
         // do ajax call to delete a calorie from server database
         // if successful, tell user and remove cal from curr_cal list and dict in angular
@@ -325,7 +333,15 @@ var ccapp = angular.module("ccapp", []);
                 $scope.toggleViewCalorie(false);
             }
             else {
-                $scope.removeUserFromCurr();
+                if (data[0].id === $scope.curr_user.id) {
+                    // logged in user deleted themselves
+                    $scope.signout();
+                }
+                else {
+                    $scope.removeUserFromCurr($scope.curr_user.id);
+                    $scope.editingUser = false;
+                    $scope.toggleViewUser(false);
+                }
             }
         };
 
@@ -394,23 +410,21 @@ var ccapp = angular.module("ccapp", []);
 
         // push users from server to the current user list
         $scope.pushUsersFromServer = function(data) {
-            /*
+
             for (var i = 0; i < data.length; i++) {
                 console.log("pushing:");
                 console.log(data[i]);
 
-                var cal = {
+                var user = {
                     id: data[i].id,
-                    user_id: data[i].user_id,
-                    date: data[i].date,
-                    time: data[i].time,
-                    amnt: data[i].num_calories,
-                    text: data[i].text
+                    username: data[i].username,
+                    user_type: data[i].user_type,
+                    exp_cal: data[i].exp_cal
                 };
 
-                $scope.curr_cals.push(cal);  
-                $scope.curr_cal_dict[cal.id] = cal;            
-            }*/
+                $scope.curr_users.push(user);  
+                $scope.curr_user_dict[user.id] = user;            
+            }
         };
 
         // get list of calories from server, pass to callback
@@ -444,20 +458,139 @@ var ccapp = angular.module("ccapp", []);
 
         /* user view functions */
         
-        // set the currently selected user to the given user
+        // set the currently selected user to the user from the server
         $scope.setCurrUserInfo = function(isClear, data) {
-            $scope.curr_user.id = isClear ? "" : data.data.user_id;
-            $scope.curr_user.username = isClear ? "" : data.data.username;
-            $scope.curr_user.user_type = isClear ? "" : data.data.user_type;
-            $scope.curr_user.exp_cal = isClear ? "" : data.data.exp_cal;
+            $scope.curr_user.id = isClear ? "" : data.id;
+            $scope.curr_user.username = isClear ? "" : data.username;
+            $scope.curr_user.user_type = isClear ? "" : data.user_type;
+            $scope.curr_user.exp_cal = isClear ? "" : data.exp_cal;
+
+            console.log(isClear);
+            console.log(data);
+            if (isClear) {
+                $scope.expCalMessage = "";    
+                $scope.expIsSet = false;     
+            }
+            else if (data.data.exp_cal < 1) {
+                console.log("here")
+                $scope.expCalMessage = "No daily calorie goal set.";    
+                $scope.expIsSet = false;
+            }
+            else {
+                $scope.expCalMessage = "Daily calorie goal: " + data.data.exp_cal;
+                $scope.expIsSet = true;
+            }
         };
 
-        $scope.toggleViewUsers = function(isShow) {
+        $scope.setCurrUserToLog = function() {
+            $scope.curr_user.id = $scope.log_user.id;
+            $scope.curr_user.username = $scope.curr_user.username;
+            $scope.curr_user.user_type = $scope.curr_user.user_type;
+            $scope.curr_user.exp_cal = $scope.curr_user.exp_cal;
 
+            if ($scope.curr_user.exp_cal < 1) {
+                $scope.expCalMessage = "No daily calorie goal set.";    
+                $scope.expIsSet = false;
+            }
+            else {
+                $scope.expCalMessage = "Daily calorie goal: " + $scope.curr_user.exp_cal;
+                $scope.expIsSet = true;
+            }
+        };
+
+        // toggle the total user view on or off
+        $scope.toggleViewUsers = function(isShow) {
+            if (isShow) {
+                $scope.viewingUsers = true;
+                $scope.toggleViewCalories(false);
+            }
+            else {
+                $scope.viewingUsers = false;
+                $scope.editingUser = false;
+            }
+            $scope.setCurrUserToLog();
         };   
 
-        $scope.toggleViewUser = function(isShow) {
+        // toggle the user profile view on or off
+        $scope.toggleViewUser = function(isShow, userID) {
+            if (isShow) {
+                $scope.viewingUser = true;
+                $scope.setCurrUserInfo(false, $scope.curr_cal_dict[parseInt(userID)]);
+                $scope.toggleEditUser(false);
+            }
+            else {
+                $scope.viewingUser = false;
+                $scope.setCurrUserToLog();
+            }
+        };
 
+        // toggle the user edit view on or off
+        $scope.toggleEditUser = function(isShow) {
+            if (isShow) {
+                $scope.editingUser = true;
+                $scope.setEditUser(false);
+            }
+            else {
+                $scope.editingUser = false;
+                $scope.setEditUser(true);
+            }
+        };
+
+        // set the information for the user to be edited
+        $scope.setEditUser = function(isClear) {
+            $scope.edit_user.id = isClear ? "" : $scope.curr_user.id;
+            $scope.edit_user.username = isClear ? "" : $scope.curr_user.username;
+            $scope.edit_user.user_type = isClear ? "" : $scope.curr_user.user_type;
+            $scope.edit_user.exp_cal = isClear ? "" : $scope.curr_user.exp_cal;
+        };
+
+        // do ajax call to edit user in server database
+        $scope.editUser = function() {
+
+            var user_id = $scope.edit_user.id
+            var username = $scope.edit_user.username;
+            var email = $scope.edit_user.email;
+            var exp_cal = $scope.edit_user.exp_cal;
+            var user_type = $scope.edit_user.user_type;
+
+            $http({
+                method:'POST',
+                url: "/edit_user?user_id="+user_id+"&username="+username+"&email="+email+"&exp_cal="+exp_cal+"&user_type="+user_type,
+                headers: {
+                   'Content-Type': 'application/json;charset=utf-8'
+                }
+            })
+            .then(function(resp){
+                console.log(resp);
+                $scope.onEditSuccessful(resp.data["Data"], "user");
+                window.alert("Successfully edited user");
+            },function(error){
+                window.alert('There was an error editing the profile on the server, check log');
+                console.log(error);
+            });
+        };
+
+        // do ajax call to delete a user from server database
+        // if successful, tell user and remove user from curr_user list and dict in angular
+        // also sign out if curr_user === log_user
+        $scope.deleteUser = function(callback) {
+
+            // TO-DO:loading graphic
+            $http({
+                method:'POST',
+                url: "/delete_user?user_id="+$scope.curr_user.id,
+                headers: {
+                   'Content-Type': 'application/json;charset=utf-8'
+                }
+            })
+            .then(function(resp){
+                console.log(resp);
+                $scope.onDeleteSuccessful(resp.data);
+                window.alert("Successfully deleted user");
+            },function(error){
+                window.alert('There was an error deleting the user from the server, check log');
+                console.log(error);
+            });
         };
 
         /* signin/out functions */
@@ -491,7 +624,7 @@ var ccapp = angular.module("ccapp", []);
             .then(function(resp){
                 console.log(resp);
                 $scope.setLoggedInUserInfo(false, resp);
-                $scope.setCurrUserInfo(false, resp);
+                $scope.setCurrUserInfo(false, resp.data);
                 $scope.setTotalDataByUser();
             },function(error){
                 console.log(error);
@@ -512,8 +645,9 @@ var ccapp = angular.module("ccapp", []);
             .then(function(resp){
                 console.log(resp);
                 $scope.setLoggedInUserInfo(true, resp);
-                $scope.setCurrUserInfo(true, resp);
+                $scope.setCurrUserInfo(true, resp.data);
                 $scope.toggleViewCalories(false);
+                $scope.toggleViewUsers(false);
                 window.alert("Logged out");
             },function(error){
                 console.log('There was an error disconnecting');

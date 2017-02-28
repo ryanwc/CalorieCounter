@@ -29,6 +29,8 @@
 		<div class="outerdiv mainviewdiv" id="caloriediv" ng-show="viewingCalories">
 
 			<div id="calorielistdiv">
+				<span id="expcalheader">//expCalMessage// <span ng-show="expIsSet">Color calories by meets daily goal: <button class="click" type="button" ng-click="toggleCalColor()">toggle</button></span></span>
+				<br>
 				<span id="calorielistheader"><button class="click addclick" type="button" ng-click="togglePostCalorie(true, true)">Add a calorie</button>, or click a calorie to view/edit</span>
 				<div id="calorielistlist">
 					<span class="calorieslistcal" ng-repeat="cal in curr_cals">
@@ -67,6 +69,52 @@
 					<br>
 					<input type="submit" value="submit">
 					<button class="click" type="button" ng-click="togglePostCalorie(false, addingCalorie)">cancel</button>
+				</form>
+			</div>
+
+		</div>
+		<!-- end calorie main view -->
+
+		<div class="outerdiv mainviewdiv" id="userdiv" ng-show="viewingUsers">
+
+			<div id="userlistdiv">
+				<span id="userlistheader">Click a user to view/edit</span>
+				<div id="userlistlist">
+					<span class="userlistuser" ng-repeat="user in curr_users">
+			      		<button class="click userbutton" id="user-//user.id//" type="button" ng-click="toggleViewUser(true, user.id)">User //user.id//:</button> <span>//user.username//</span>
+			      		<br>
+			      	</span>
+			    </div>
+			</div>
+
+			<div id="singleuserdiv" ng-show="viewingUser">
+				<span id="singleuserheader">User //curr_user.id//</span>
+				<br>
+		      	<span>Username: //curr_user.username//</span>
+		      	<br>
+		      	<span>Email: //curr_user.email//</span>
+		      	<br>
+		      	<span>Expected cals/day: //curr_user.exp_cal//</span>
+		      	<br>
+		      	<span>User type: //curr_user.user_type//</span>
+		      	<br>
+		      	<button class="click editclick" type="button" ng-click="toggleEditUser(true, false)">edit profile</button> | <button class="click deleteclick" ng-click="deleteUser()">delete user</button> | <button type="button" ng-click="toggleViewUser(false)">close profile</button>
+			</div>
+
+			<div id="edituserdiv" ng-show="editingUser">
+				<form id="edituserform" ng-submit="editUser()">
+					<span class="userformheader" ng-show="editingUser">Change profile as desired and submit.</span>
+					<br>
+					<span class="attridentifier">Username: </span><input type="text" ng-model="edit_user.username">
+					<br> 
+					<span class="attridentifier">Email: </span><input type="text" ng-model="edit_user.username">
+					<br>
+					<span class="attridentifier">Expected cals/day: </span><input type="text" ng-model="edit_user.exp_cals">
+					<br>
+					<span class="attridentifier" ng-show="canCRUDUsers()">User Type: </span><select ng-model="edit_user.user_type" ng-options="type.name for type in user_types">
+					<br>
+					<input type="submit" value="submit">
+					<button class="click" type="button" ng-click="toggleEditUser(false)">cancel</button>
 				</form>
 			</div>
 
