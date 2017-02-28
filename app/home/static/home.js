@@ -519,6 +519,8 @@ var ccapp = angular.module("ccapp", []);
 
         // toggle the user profile view on or off
         $scope.toggleViewUser = function(isShow, userID) {
+            $scope.toggleViewCalorie(false);
+            $scope.togglePostCalorie(false, false);
             if (isShow) {
                 $scope.viewingUsers = true;
                 $scope.viewingUser = true;
