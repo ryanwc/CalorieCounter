@@ -113,6 +113,47 @@ var ccapp = angular.module("ccapp", []);
                     ($scope.curr_date_from.getFullYear() == $scope.curr_date_to.getFullYear() &&
                         $scope.curr_date_from.getMonth() == $scope.curr_date_to.getMonth() &&
                         $scope.curr_date_from.getDate() <= $scope.curr_date_to.getDate()));
+        };
+
+        $scope.calDateIsEalier = function(calDate, filterDate) {
+            return (calDate.getFullYear() < filterDate.getFullYear() || 
+                    (calDate.getFullYear() == filterDate.getFullYear() && calDate.getMonth() < filterDate.getMonth()) ||
+                    (calDate.getFullYear() == filterDate.getFullYear() && calDate.getMonth() == filterDate.getMonth() &&
+                        calDate.getDate() < filterDate.getDate()));
+        };
+
+        $scope.calDateIsLater = function(calDate, filterDate) {
+            return (calDate.getFullYear() > filterDate.getFullYear() || 
+                    (calDate.getFullYear() == filterDate.getFullYear() && calDate.getMonth() > filterDate.getMonth()) ||
+                    (calDate.getFullYear() == filterDate.getFullYear() && calDate.getMonth() == filterDate.getMonth() &&
+                        calDate.getDate() > filterDate.getDate()));
+        };
+
+        $scope.calIsInFilter = function(calorie) {
+
+            console.log(calorie);
+            console.log(calorie.date);
+            console.log(calorie.time);
+            var date = calorie.date;
+            var time = calorie.time;
+
+            if ($scope.curr_date_from) {
+                if ($scope.calDateIsEalier(date, $scope.curr_date_from)) {
+                    return false;
+                }
+            }
+
+            if ($scope.curr_date_to) {
+                if ($scope.calDateIsLater(date, $scope.curr_date_to)) {
+                    return false;
+                }
+            }
+
+            if (time < $scope.curr_time_from || time > $scope.curr_time_to) {
+                return false;
+            }
+
+            return true;
         }
 
         /* permissions determiner functions */
@@ -403,7 +444,7 @@ var ccapp = angular.module("ccapp", []);
                 date_str: data[0].date,
                 date: new Date(data[0].date),
                 time_str: data[0].time,
-                time: parseInt(data[0].time.substring(0,2)),
+                time: parseInt(data[0].time.split(":")),
                 amnt: data[0].num_calories,
                 text: data[0].text
             };
@@ -429,7 +470,7 @@ var ccapp = angular.module("ccapp", []);
                     date_str: data[i].date,
                     date: new Date(data[i].date),
                     time_str: data[i].time,
-                    time: parseInt(data[i].time.substring(0,2)),
+                    time: parseInt(data[i].time.split(":")),
                     amnt: data[i].num_calories,
                     text: data[i].text
                 };
