@@ -16,6 +16,7 @@ var ccapp = angular.module("ccapp", []);
 
         /* vars related to database info*/
         $scope.expCalMessage = "";
+        $scope.calsColored = false;
 
         $scope.curr_cal_dict = {};
         $scope.curr_user_dict = {};
@@ -33,7 +34,9 @@ var ccapp = angular.module("ccapp", []);
             time_str: "",
             time: "",
             amnt: "",
-            text: ""
+            text: "",
+            meets: "",
+            daytotal: ""
         };
 
         $scope.post_cal = {
@@ -44,7 +47,9 @@ var ccapp = angular.module("ccapp", []);
             time_str: "",
             time: "",
             amnt: "",
-            text: ""
+            text: "",
+            meets: "",
+            daytotal: ""
         };
 
         $scope.curr_user = {
@@ -52,7 +57,7 @@ var ccapp = angular.module("ccapp", []);
             username: "",
             email: "",
             user_type_id: "",
-            exp_cal_day: ""          
+            exp_cal_day: "",         
         };
 
         $scope.post_user = {
@@ -208,6 +213,12 @@ var ccapp = angular.module("ccapp", []);
         };
 
         /* calorie view functions */
+
+        // toggle viewing calories by 'on day that meets goal' on or off
+        $scope.toggleCalColor = function() {
+
+            $scope.calsColored = !$scope.calsColored;
+        };
 
         // set the currently selected calorie to the given calorie
         $scope.setCurrCalorie = function(isClear, data) {
@@ -438,6 +449,7 @@ var ccapp = angular.module("ccapp", []);
 
         $scope.editCalorieInCurr = function(data) {
 
+            console.log(data[0]);
             var cal = {
                 id: data[0].id,
                 user_id: data[0].user_id,
@@ -446,7 +458,9 @@ var ccapp = angular.module("ccapp", []);
                 time_str: data[0].time,
                 time: parseInt(data[0].time.split(":")),
                 amnt: data[0].num_calories,
-                text: data[0].text
+                text: data[0].text,
+                meets: data[0].meets,
+                daytotal: parseInt(data[0].daytotal)
             };
             
             console.log("before edit");
@@ -464,6 +478,7 @@ var ccapp = angular.module("ccapp", []);
                 console.log("pushing:");
                 console.log(data[i]);
 
+                console.log(data[i]);
                 var cal = {
                     id: data[i].id,
                     user_id: data[i].user_id,
@@ -472,7 +487,9 @@ var ccapp = angular.module("ccapp", []);
                     time_str: data[i].time,
                     time: parseInt(data[i].time.split(":")),
                     amnt: data[i].num_calories,
-                    text: data[i].text
+                    text: data[i].text,
+                    meets: data[0].meets,
+                    daytotal: parseInt(data[0].daytotal)
                 };
 
                 $scope.curr_cal_dict[cal.id] = cal;         

@@ -45,7 +45,7 @@
 				<div class="listlist">
 					<span class="listitem" ng-repeat="cal in curr_cal_dict">
 						<span ng-show="calIsInFilter(cal)" ng-if="cal.user_id == curr_user.id">
-				      		<button class="click calbutton" id="cal-//cal.id//" type="button" ng-click="toggleViewCalorie(true, cal.id)">Calorie //cal.id//:</button> <span>Date: //cal.date_str//; Amount: //cal.amnt//</span>
+				      		<button class="click calbutton-//calsColored//-//cal.meets//" id="cal-//cal.id//" type="button" ng-click="toggleViewCalorie(true, cal.id)">Calorie //cal.id//:</button> <span>Date: //cal.date_str//; Amount: //cal.amnt//</span>
 				      		<br>
 			      		</span>
 			      	</span>

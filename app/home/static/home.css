@@ -76,6 +76,13 @@ li {
 	border: 1px solid black;
 }
 
+.calbutton-true-true {
+	background-color: green;
+}
+.calbutton-true-false {
+	background-color: red;
+}
+
 .signedIn-true {
 
 }
