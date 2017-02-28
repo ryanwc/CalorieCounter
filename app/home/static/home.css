@@ -41,8 +41,31 @@ li {
 	background-color: #ff0000;
 }
 
-.calformheader {
+.singleheader {
 	text-decoration: underline;
+}
+.formheader {
+	text-decoration: underline;
+}
+.cruddiv {
+	background-color: #b3b3b3;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-top: 2px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	padding-bottom: 2px;
+	border: 1px solid black;
+}
+.singlediv {
+	background-color: #b3b3b3;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-top: 2px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	padding-bottom: 2px;
+	border: 1px solid black;
 }
 
 .signedIn-true {
@@ -114,29 +137,6 @@ li {
 	padding-bottom: 2px;
 	border: 1px solid black;
 	overflow-y: scroll;
-}
-#singlecaloriediv {
-	background-color: #b3b3b3;
-	padding-left: 15px;
-	padding-right: 15px;
-	padding-top: 2px;
-	margin-top: 5px;
-	margin-bottom: 5px;
-	padding-bottom: 2px;
-	border: 1px solid black;
-}
-#singlecalorieheader {
-	text-decoration: underline;
-}
-#postcaloriediv {
-	background-color: #b3b3b3;
-	padding-left: 15px;
-	padding-right: 15px;
-	padding-top: 2px;
-	margin-top: 5px;
-	margin-bottom: 5px;
-	padding-bottom: 2px;
-	border: 1px solid black;
 }
 
 #controldiv	{

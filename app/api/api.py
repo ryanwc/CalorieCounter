@@ -22,7 +22,7 @@ def get_user_type():
 
     Args that can be sent as part of http query string:
         None. This endpoint method will simply show which user types
-        are in the database.
+        exist (and their properties)
     Return:
         A JSON representing the database version(s) of the user type(s) 
         specified by the given arguments
@@ -44,7 +44,7 @@ def get_user_type():
 
 @ccapp.route('/add_user_type', methods=['POST'])
 def add_user_type():
-    """Endpoint for edint user type records from the database.
+    """Endpoint for adding user type records from the database.
     Currently unimplemented and unneeded. If user types need to be
     created, updated, or deleted, the super user should change from direct 
     connection to database.
@@ -53,7 +53,7 @@ def add_user_type():
 
 @ccapp.route('/edit_user_type', methods=['POST'])
 def edit_user_type():
-    """Endpoint for edint user type records from the database.
+    """Endpoint for editing user type records from the database.
     Currently unimplemented and unneeded. If user types need to be
     created, updated, or deleted, the super user should change from direct 
     connection to database.
@@ -282,8 +282,8 @@ def get_calorie():
         user_id = int(request.args.get("user_id"))
         # check perissions for reading this user's calories
         if not utils.isAuthorizedCalAction(user_id, 
-            login_session["user_id"], login_session["user_type_id"]):
-                response = make_response(json.\
+                login_session["user_id"], login_session["user_type_id"]):
+            response = make_response(json.\
             dumps('Not authorized for cal actions for given user'), 403)
             response.headers['Content-Type'] = 'application/json'
             return response
