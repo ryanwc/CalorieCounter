@@ -261,7 +261,10 @@ def add_calorie():
         text: the calorie's description
         amnt: the new number of calories
     Return:
-        A JSON representing the database version(s) of the created calorie
+        A JSON representing the database version(s) of the created calorie,
+        with extra field representing the possibly new calorie total for that 
+        day so the client may change pass/fail for any cached calories for that
+        day.
     """
     print request.args
 
@@ -310,7 +313,12 @@ def add_calorie():
     calorie = DataManager.get_calorie(calorie_id=cal_id)
 
     if calorie:
-        return jsonify(Data=[calorie.serialize])
+        (daytotal, meets) = utils.pass_fail_cal(calorie)
+        sCal = calorie.serialize
+        sCal["daytotal"] = daytotal
+        sCal["meets"] = meets
+        utils.pass_fail_cal(calorie)
+        return jsonify(Data=[sCal])
     else:
         response = make_response(json.dumps('Internal server error'), 500)
         response.headers['Content-Type'] = 'application/json'
@@ -329,7 +337,10 @@ def edit_calorie():
         text: the new description
         num_calories: the new number of calories
     Return:
-        A JSON representing the database version of the updated calorie
+        A JSON representing the database version of the updated calorie,         
+        with extra field representing the possibly new calorie total for that 
+        day so the client may change pass/fail for any cached calories for that
+        day.
     """
     if request.args.get("calorie_id") and \
         len(request.args.get("calorie_id")) > 0:
@@ -374,10 +385,13 @@ def edit_calorie():
         time=time, text=text, num_calories=amnt)
     calorie = DataManager.get_calorie(calorie_id=calorie_id)
 
-    print calorie
-
     if calorie:
-        return jsonify(Data=[calorie.serialize])
+        (daytotal, meets) = utils.pass_fail_cal(calorie)
+        sCal = calorie.serialize
+        sCal["daytotal"] = daytotal
+        sCal["meets"] = meets
+        utils.pass_fail_cal(calorie)
+        return jsonify(Data=[sCal])
     else:
         response = make_response(json.dumps('Internal server error'), 500)
         response.headers['Content-Type'] = 'application/json'
@@ -391,18 +405,25 @@ def delete_calorie():
     Args that can be sent as part of http query string:
         calorie_id: the id of the calorie to delete
     Return:
-        A JSON representing deletion success or failure
+        A JSON representing deletion success or failure, with success
+        representing the possibly new calorie total for that day so the client 
+        may change pass/fail for any cached calories for that day.
     """
     if request.args.get("calorie_id") and \
         len(request.args.get("calorie_id")) > 0:
 
         calorie_id = int(request.args.get("calorie_id"))
+        calorie = DataManager.get_calorie(calorie_id=calorie_id)
+        (daytotal, meets) = utils.pass_fail_cal(calorie)
+        date = calorie.date
         result = DataManager.delete_calorie(calorie_id)
         if result == 1:
             return jsonify({"Message": "Successful deletion",
                             "Post": "deletion",
                             "Model": "calorie",
-                            "Id": calorie_id})
+                            "Id": calorie_id,
+                            "daytotal": daytotal,
+                            "date": date})
         else:
             response = make_response(json.\
                 dumps('Calorie id did not match any in db'), 401)
