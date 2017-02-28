@@ -55,7 +55,7 @@ def set_session_user_info():
     login_session['user_id'] = user.id
     login_session['username'] = user.username
     login_session['user_type_id'] = user.user_type_id
-    login_session['exp_cal'] = user.exp_cal_day
+    login_session['exp_cal_day'] = user.exp_cal_day
 
 
 def get_client_login_session():

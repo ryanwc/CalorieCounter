@@ -93,11 +93,6 @@ def add_calorie(user_id, date, time, text, num_calories):
     """
     session = get_calorie_db_session()
 
-    print user_id
-    print date
-    print time
-    print text
-    print num_calories
     calorie = Calorie(user_id=user_id, date=date, time=time, text=text, 
         num_calories=num_calories)
 
@@ -301,7 +296,7 @@ def edit_calorie(calorie_id, user_id=None, date=None, time=None,
     
     if time:
         calorie.time = time
-        
+
     if text:
         calorie.text = text
 
@@ -376,7 +371,6 @@ def delete_calorie(calorie_id):
 
     session.commit()
     session.close()
-    print result
     return result
 
 def add_rows_from_json(json_rows, table_constructor):

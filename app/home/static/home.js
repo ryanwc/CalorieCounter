@@ -50,7 +50,7 @@ var ccapp = angular.module("ccapp", []);
             username: "",
             email: "",
             user_type: "",
-            exp_cal: ""          
+            exp_cal_day: ""          
         };
 
         $scope.edit_user = {
@@ -58,7 +58,7 @@ var ccapp = angular.module("ccapp", []);
             username: "",
             email: "",
             user_type: "",
-            exp_cal: ""         
+            exp_cal_day: ""         
         };
 
         $scope.log_user = {
@@ -66,7 +66,7 @@ var ccapp = angular.module("ccapp", []);
             username: "",
             email: "",
             user_type: "",
-            exp_cal: ""
+            exp_cal_day: ""
         };
 
         /* vars related to user actions */
@@ -303,6 +303,9 @@ var ccapp = angular.module("ccapp", []);
                 $scope.setCurrUserInfo(false, $scope.curr_user_dict[data[0].id]);
                 $scope.editingUser = false;
                 $scope.toggleEditUser(false);
+                if (data[0].id === $scope.log_user.id) {
+                    $scope.setLoggedInUserInfo(false, data[0]);
+                }
             }
         };
 
@@ -339,7 +342,7 @@ var ccapp = angular.module("ccapp", []);
                 $scope.toggleViewCalorie(false);
             }
             else {
-                if (data[0].id === $scope.curr_user.id) {
+                if (data.id === $scope.curr_user.id) {
                     // logged in user deleted themselves
                     $scope.signout();
                 }
@@ -425,7 +428,7 @@ var ccapp = angular.module("ccapp", []);
                     id: data[i].id,
                     username: data[i].username,
                     user_type: data[i].user_type,
-                    exp_cal: data[i].exp_cal,
+                    exp_cal_day: data[i].exp_cal_day,
                     email: data[i].email
                 };
 
@@ -473,7 +476,7 @@ var ccapp = angular.module("ccapp", []);
             $scope.curr_user.username = isClear ? "" : data.username;
             $scope.curr_user.user_type = isClear ? "" : data.user_type;
             $scope.curr_user.email = isClear ? "" : data.email;
-            $scope.curr_user.exp_cal = isClear ? "" : data.exp_cal;
+            $scope.curr_user.exp_cal_day = isClear ? "" : data.exp_cal_day;
 
             console.log(isClear);
             console.log(data);
@@ -481,30 +484,31 @@ var ccapp = angular.module("ccapp", []);
                 $scope.expCalMessage = "";    
                 $scope.expIsSet = false;     
             }
-            else if (data.exp_cal < 1) {
+            else if (data.exp_cal_day < 1) {
                 console.log("here")
                 $scope.expCalMessage = "No daily calorie goal set.";    
                 $scope.expIsSet = false;
             }
             else {
-                $scope.expCalMessage = "Daily calorie goal: " + data.exp_cal;
+                $scope.expCalMessage = "Daily calorie goal: " + data.exp_cal_day;
                 $scope.expIsSet = true;
             }
         };
 
+        // set the current user to the logged in user
         $scope.setCurrUserToLog = function() {
             $scope.curr_user.id = $scope.log_user.id;
             $scope.curr_user.username = $scope.log_user.username;
             $scope.curr_user.user_type = $scope.log_user.user_type;
-            $scope.curr_user.exp_cal = $scope.log_user.exp_cal;
+            $scope.curr_user.exp_cal_day = $scope.log_user.exp_cal_day;
             $scope.curr_user.email = $scope.log_user.email;
 
-            if ($scope.curr_user.exp_cal < 1) {
+            if ($scope.curr_user.exp_cal_day < 1) {
                 $scope.expCalMessage = "No daily calorie goal set.";    
                 $scope.expIsSet = false;
             }
             else {
-                $scope.expCalMessage = "Daily calorie goal: " + $scope.curr_user.exp_cal;
+                $scope.expCalMessage = "Daily calorie goal: " + $scope.curr_user.exp_cal_day;
                 $scope.expIsSet = true;
             }
         };
@@ -563,7 +567,7 @@ var ccapp = angular.module("ccapp", []);
             $scope.edit_user.username = isClear ? "" : $scope.curr_user.username;
             $scope.edit_user.user_type = isClear ? "" : $scope.curr_user.user_type;
             $scope.edit_user.email = isClear ? "" : $scope.curr_user.email;
-            $scope.edit_user.exp_cal = isClear ? "" : $scope.curr_user.exp_cal;
+            $scope.edit_user.exp_cal_day = isClear ? "" : $scope.curr_user.exp_cal_day;
         };
 
         // do ajax call to edit user in server database
@@ -572,12 +576,12 @@ var ccapp = angular.module("ccapp", []);
             var user_id = $scope.edit_user.id
             var username = $scope.edit_user.username;
             var email = $scope.edit_user.email;
-            var exp_cal = $scope.edit_user.exp_cal;
+            var exp_cal_day = $scope.edit_user.exp_cal_day;
             var user_type = $scope.edit_user.user_type;
 
             $http({
                 method:'POST',
-                url: "/edit_user?user_id="+user_id+"&username="+username+"&email="+email+"&exp_cal="+exp_cal+"&user_type="+user_type,
+                url: "/edit_user?user_id="+user_id+"&username="+username+"&email="+email+"&exp_cal_day="+exp_cal_day+"&user_type="+user_type,
                 headers: {
                    'Content-Type': 'application/json;charset=utf-8'
                 }
@@ -590,6 +594,44 @@ var ccapp = angular.module("ccapp", []);
                 window.alert('There was an error editing the profile on the server, check log');
                 console.log(error);
             });
+        };
+
+        // edit a user in current model
+        $scope.editUserInCurr = function(data) {
+
+            var user = {
+                id: data[0].id,
+                username: data[0].username,
+                email: data[0].email,
+                exp_cal_day: data[0].exp_cal_day,
+                user_type: data[0].user_type
+            };
+            
+            console.log("before edit");
+            console.log($scope.curr_user_dict[data[0].id]);
+            // replace with edited calorie
+            for (var i = 0; i < $scope.curr_users.length; i++) {
+
+                if ($scope.curr_users[i].id === user.id) {
+                    $scope.curr_users[i] = user;
+                    break;
+                }
+            }
+            $scope.curr_user_dict[data[0].id] = user;     
+            console.log("after edit");
+            console.log($scope.curr_user_dict[data[0].id]);
+        };
+
+        // remove a user from the current model/view
+        $scope.removeUserFromCurr = function(userID) {
+
+            for (var i = 0; i < $scope.curr_users.length; i++) {
+                if ($scope.curr_users[i].id === userID) {
+                    $scope.curr_users = $scope.curr_users.splice(i, 1);
+                    break;
+                }
+            }
+            delete $scope.curr_users_dict[parseInt(userID)];
         };
 
         // do ajax call to delete a user from server database
@@ -619,14 +661,13 @@ var ccapp = angular.module("ccapp", []);
 
         // set the logged in user to the given user
         $scope.setLoggedInUserInfo = function(isClear, data) {
-            $scope.log_user.id = isClear ? "" : data.data.id;
-            $scope.log_user.username = isClear ? "" : data.data.username;
-            $scope.log_user.user_type = isClear ? "" : data.data.user_type;
-            $scope.log_user.exp_cal = isClear ? "" : data.data.exp_cal;
-            $scope.log_user.email = isClear ? "" : data.data.email;
+            $scope.log_user.id = isClear ? "" : data.id;
+            $scope.log_user.username = isClear ? "" : data.username;
+            $scope.log_user.user_type = isClear ? "" : data.user_type;
+            $scope.log_user.exp_cal_day = isClear ? "" : data.exp_cal_day;
+            $scope.log_user.email = isClear ? "" : data.email;
             console.log($scope.log_user.user_type);
             console.log($scope.user_type_dict);
-            console.log($scope.user_type_dict[$scope.log_user.user_type].name);
         };
 
         $scope.isSignedIn = function() {
@@ -649,7 +690,7 @@ var ccapp = angular.module("ccapp", []);
             })
             .then(function(resp){
                 console.log(resp);
-                $scope.setLoggedInUserInfo(false, resp);
+                $scope.setLoggedInUserInfo(false, resp.data);
                 $scope.setCurrUserInfo(false, resp.data);
                 $scope.setTotalDataByUserType();
             },function(error){

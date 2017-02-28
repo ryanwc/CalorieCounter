@@ -94,7 +94,7 @@
 		      	<br>
 		      	<span>Email: //curr_user.email//</span>
 		      	<br>
-		      	<span>Expected cals/day: //curr_user.exp_cal//</span>
+		      	<span>Expected cals/day: //curr_user.exp_cal_day//</span>
 		      	<br>
 		      	<span>User type: //curr_user.user_type//</span>
 		      	<br>
@@ -109,7 +109,7 @@
 					<br> 
 					<span class="attridentifier">Email: </span><input type="text" ng-model="edit_user.email">
 					<br>
-					<span class="attridentifier">Expected cals/day: </span><input type="text" ng-model="edit_user.exp_cals">
+					<span class="attridentifier">Expected cals/day: </span><input type="text" ng-model="edit_user.exp_cal_day">
 					<br>
 					<span class="attridentifier" ng-show="canCRUDUsers()">User Type: <select ng-show="canCRUDUsers()" ng-init="edit_user.user_type = type.id" ng-model="edit_user.user_type" ng-options="type.name for type in user_type_dict track by type.id">--user type--</select>(was //user_type_dict[curr_user.user_type].name//)</span>
 					<br>

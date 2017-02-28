@@ -35,11 +35,10 @@ def get_user_type():
     user_type = DataManager.get_user_type()
 
     if len(user_type) > 0:
-        # multiple results
         return jsonify(Data=[i.serialize for i in user_type])
     else:
         # no results, return empty list
-        return jsonify(user_type)
+        return jsonify(Data=[])
 
 
 @ccapp.route('/add_user_type', methods=['POST'])
@@ -120,7 +119,7 @@ def get_user():
         return jsonify(Data=[i.serialize for i in user])
     else:
         # no results, return empty list
-        return jsonify([])
+        return jsonify(Data=[])
 
 
 @ccapp.route('/edit_user', methods=['POST'])
@@ -131,11 +130,12 @@ def edit_user():
         user_id: the id of the user to edit
         email: the new email
         username: the new username
-        exp_cal: the new expected calories / day
+        exp_cal_day the new expected calories / day
         user_type: the new user type
     Return:
         A JSON representing the given user edited as specified
     """
+    print request.args
     if not utils.is_logged_in():
         response = make_response(json.\
             dumps('Must sign in to CRUD'), 403)
@@ -151,7 +151,7 @@ def edit_user():
 
     if request.args.get("username") and \
         len(request.args.get("username")) > 0:
-        username = int(request.args.get("username"))
+        username = request.args.get("username")
     else:
         username = None    
 
@@ -161,34 +161,37 @@ def edit_user():
     else:
         email = None
 
-    if request.args.get("exp_cal") and \
-        len(request.args.get("exp_cal")) > 0:
-        exp_cal = request.args.get("exp_cal")
+    if request.args.get("exp_cal_day") and \
+        len(request.args.get("exp_cal_day")) > 0:
+        exp_cal_day = int(request.args.get("exp_cal_day"))
     else:
-        exp_cal = None
+        exp_cal_day = None
 
     if request.args.get("user_type") and \
         len(request.args.get("user_type")) > 0:
-        user_type = request.args.get("user_type")
+        user_type = int(request.args.get("user_type"))
     else:
         user_type = None     
 
-    user = DataManager.get_user(user_id=user_id)
+    userCheck = DataManager.get_user(user_id=user_id)
 
-    if not utils.isAuthorizedUserAction(user.user_id, 
+    # check permissions
+    if not utils.isAuthorizedUserAction(userCheck.id, 
             login_session["user_id"], login_session["user_type_id"]):
         response = make_response(json.\
             dumps('Not authorized for actions on given user'), 403)
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    DataManager.edit_user(user_id=user_id, username=username, email=email)
+    DataManager.edit_user(user_id=user_id, username=username, email=email, 
+        exp_cal_day=exp_cal_day)
+
     user = DataManager.get_user(user_id=user_id)
 
     if user:
-        return jsonify(Data=[user])
+        return jsonify(Data=[user.serialize])
     else:
-        response = make_response(json.dumps('Internal server error'), 500)
+        response = make_response(json.dumps('Internal server error on update'), 500)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -213,7 +216,7 @@ def delete_user():
         user = DataManager.get_user(user_id=user_id)
 
         # check permissions
-        if not utils.isAuthorizedUserAction(user.user_id, 
+        if not utils.isAuthorizedUserAction(user.id, 
             login_session["user_id"], login_session["user_type_id"]):
 
             response = make_response(json.\
@@ -341,7 +344,7 @@ def get_calorie():
         return jsonify(Data=sCals)
     else:
         # no results, return empty list
-        return jsonify(calorie)
+        return jsonify(Data=[])
 
 @ccapp.route('/add_calorie', methods=['POST'])
 def add_calorie():
@@ -648,7 +651,7 @@ def gconnect():
                     'user_id': login_session['user_id'],
                     'user_type': login_session['user_type_id'],
                     'email': login_session['email'],
-                    'exp_cal': login_session['exp_cal'],
+                    'exp_cal_day': login_session['exp_cal_day'],
                     'Access-Control-Allow-Origin': '*'})
     
     # store relevant credentials
@@ -671,7 +674,7 @@ def gconnect():
                     'id': login_session['user_id'],
                     'user_type': login_session['user_type_id'],
                     'email': login_session['email'],
-                    'exp_cal': login_session['exp_cal'],
+                    'exp_cal_day': login_session['exp_cal_day'],
                     'Access-Control-Allow-Origin': '*'})
 
 
