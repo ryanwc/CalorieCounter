@@ -20,13 +20,26 @@ def pass_fail_cal(calorie):
     # (met if no exp_total set)
     return daytotal, daytotal <= user.exp_cal_day or user.exp_cal_day == 0
 
+def isAuthorizedCalAction(user_id, cruder_user_id):
+    """Return whether the cruder_user_id in user has permissions for calorie 
+    actions on calories owned by user_id.
+    """
+    return user_id == cruder_user_id or \
+            DataManager.get_user_type(user_type_id=cruder_user_type_id).CRUD_all
+
+def isAuthorizedUserAction(user_id, cruder_user_id, cruder_user_type_id):
+    """Return whether the cruder_user_id in user has permissions for user profile 
+    actions on user_id.
+    """
+    return user_id == cruder_user_id or \
+            DataManager.get_user_type(user_type_id=cruder_user_type_id).CRUD_users
+
 def is_logged_in():
     """Return true if the user is logged in, false otherwise.
     """
     return ('credentials' in login_session and
             'access_token' in login_session['credentials'] and
             'user_id' in login_session)
-
 
 def set_session_user_info():
     """Populate the login session with the logged in user's settings.

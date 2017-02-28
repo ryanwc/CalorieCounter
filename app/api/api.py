@@ -17,7 +17,7 @@ CORS(ccapp)
 # data access endpoints
 
 @ccapp.route('/user_type', methods=['GET', 'POST'])
-def user_type():
+def get_user_type():
     """Endpoint for serving user type records from the database.
 
     Args that can be sent as part of http query string:
@@ -33,6 +33,11 @@ def user_type():
         A JSON representing the database version(s) of the user type(s) 
         specified by the given arguments
     """
+    if not utils.is_logged_in():
+        response = make_response(json.\
+            dumps('Must sign in to CRUD'), 403)
+        response.headers['Content-Type'] = 'application/json'
+
     if request.args.get("user_type_id") and \
         len(request.args.get("user_type_id")) > 0:
         user_type_id = int(request.args.get("user_type_id"))
@@ -86,6 +91,11 @@ def delete_user_type():
     Return:
         A JSON representing deletion success or failure
     """
+    if not utils.is_logged_in():
+        response = make_response(json.\
+            dumps('Must sign in to CRUD'), 403)
+        response.headers['Content-Type'] = 'application/json'
+
     if request.args.get("user_type_id") and \
         len(request.args.get("user_type_id")) > 0:
 
@@ -100,7 +110,7 @@ def delete_user_type():
 
 
 @ccapp.route('/user', methods=['GET', 'POST'])
-def user():
+def get_user():
     """Endpoint for serving user records from the database.
 
     Args that can be sent as part of http query string:
@@ -111,7 +121,10 @@ def user():
         A JSON representing the database version(s) of the user(s) specified
         by the given arguments
     """
-    print request.args
+    if not utils.is_logged_in():
+        response = make_response(json.\
+            dumps('Must sign in to CRUD'), 403)
+        response.headers['Content-Type'] = 'application/json'
 
     if request.args.get("user_id") and \
         len(request.args.get("user_id")) > 0:
@@ -153,6 +166,11 @@ def delete_user():
     Return:
         A JSON representing deletion success or failure
     """
+    if not utils.is_logged_in():
+        response = make_response(json.\
+            dumps('Must sign in to CRUD'), 403)
+        response.headers['Content-Type'] = 'application/json'
+
     if request.args.get("user_id") and \
         len(request.args.get("user_id")) > 0:
 
@@ -185,6 +203,11 @@ def get_calorie():
         A JSON representing the database version(s) of the calorie(s) specified
         by the given arguments
     """
+    if not utils.is_logged_in():
+        response = make_response(json.\
+            dumps('Must sign in to CRUD'), 403)
+        response.headers['Content-Type'] = 'application/json'
+
     if request.args.get("calorie_id") and \
         len(request.args.get("calorie_id")) > 0:
         calorie_id = int(request.args.get("calorie_id"))
@@ -266,11 +289,20 @@ def add_calorie():
         day so the client may change pass/fail for any cached calories for that
         day.
     """
-    print request.args
+    if not utils.is_logged_in():
+        response = make_response(json.\
+            dumps('Must sign in to CRUD'), 403)
+        response.headers['Content-Type'] = 'application/json'
 
     if request.args.get("user_id") and \
         len(request.args.get("user_id")) > 0:
+
         user_id = int(request.args.get("user_id"))
+        if not utils.isAuthorizedCalAction(user_id, login_session["user_id"]):
+            response = make_response(json.\
+                dumps('Not authorized for cal actions for given user'), 403)
+            response.headers['Content-Type'] = 'application/json'
+            return response             
     else:
         response = make_response(json.dumps('Must provide valid user id'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -342,6 +374,11 @@ def edit_calorie():
         day so the client may change pass/fail for any cached calories for that
         day.
     """
+    if not utils.is_logged_in():
+        response = make_response(json.\
+            dumps('Must sign in to CRUD'), 403)
+        response.headers['Content-Type'] = 'application/json'
+
     if request.args.get("calorie_id") and \
         len(request.args.get("calorie_id")) > 0:
         calorie_id = int(request.args.get("calorie_id"))
@@ -381,6 +418,23 @@ def edit_calorie():
     else:
         amnt = None 
 
+    # check permissions
+    calorie = DataManager.get_calorie(calorie_id=calorie_id)
+    if not utils.isAuthorizedCalAction(calorie.user_id, 
+        login_session["user_id"]):
+            response = make_response(json.\
+                dumps('Not authorized for cal actions for given user'), 403)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+    if user_id and not utils.isAuthorizedCalAction(user_id, 
+        login_session["user_id"]):
+            response = make_response(json.\
+                dumps('Not authorized for cal actions for given user'), 403)
+            response.headers['Content-Type'] = 'application/json'
+            return response 
+
+    # make the update and return
     DataManager.edit_calorie(calorie_id, user_id=user_id, date=date,
         time=time, text=text, num_calories=amnt)
     calorie = DataManager.get_calorie(calorie_id=calorie_id)
@@ -409,11 +463,27 @@ def delete_calorie():
         representing the possibly new calorie total for that day so the client 
         may change pass/fail for any cached calories for that day.
     """
+    if not utils.is_logged_in():
+        response = make_response(json.\
+            dumps('Must sign in to CRUD'), 403)
+        response.headers['Content-Type'] = 'application/json'
+
     if request.args.get("calorie_id") and \
         len(request.args.get("calorie_id")) > 0:
 
         calorie_id = int(request.args.get("calorie_id"))
         calorie = DataManager.get_calorie(calorie_id=calorie_id)
+
+        # check permissions
+        if not utils.isAuthorizedCalAction(calorie.user_id, 
+            login_session["user_id"]):
+
+            response = make_response(json.\
+                dumps('Not authorized for cal actions for given user'), 403)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+        # update and return
         (daytotal, meets) = utils.pass_fail_cal(calorie)
         date = calorie.date
         result = DataManager.delete_calorie(calorie_id)
