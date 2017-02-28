@@ -12,6 +12,14 @@ li {
 	margin-left: 5px;
 }
 
+.filters {
+	font-size: .85em;
+}
+.invalid {
+	color: red;
+	font-size: .85em;
+}
+
 .mainviewdiv {
 	left: 50%;
 	padding-left: 15px;

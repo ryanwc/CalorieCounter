@@ -19,7 +19,11 @@ var ccapp = angular.module("ccapp", []);
 
         $scope.curr_cal_dict = {};
         $scope.curr_user_dict = {};
-        $scope.user_type_dict = {};
+        $scope.user_type_dict = {};     
+        $scope.curr_date_from = null;
+        $scope.curr_date_to = null;
+        $scope.curr_time_from = 0;
+        $scope.curr_time_to = 23;  
 
         $scope.curr_cal = {
             id: "",
@@ -79,6 +83,37 @@ var ccapp = angular.module("ccapp", []);
         $scope.postingUser = false;
         $scope.addingUser = false;
         $scope.editingUser = false;
+
+        /* date functions */
+        $scope.resetCalFilters = function() {
+            $scope.curr_date_from = null;
+            $scope.curr_date_to = null;
+            $scope.curr_time_from = 0;
+            $scope.curr_time_to = 23; 
+        };
+
+        $scope.isValidFilter = function() {
+            return $scope.curr_time_from <= $scope.curr_time_to && $scope.datesOK();
+        };   
+
+        $scope.datesOK = function() {
+            if (!$scope.curr_date_from || !$scope.curr_date_to) {
+                return true;
+            }
+            console.log($scope.curr_date_from);
+            console.log($scope.curr_date_from.getFullYear() < $scope.curr_date_to.getFullYear());
+            console.log($scope.curr_date_from.getFullYear() == $scope.curr_date_to.getFullYear() &&
+                        $scope.curr_date_from.getMonth() < $scope.curr_date_to.getMonth());
+            console.log($scope.curr_date_from.getFullYear() == $scope.curr_date_to.getFullYear() &&
+                        $scope.curr_date_from.getMonth() == $scope.curr_date_to.getMonth() &&
+                        $scope.curr_date_from.getDate() <= $scope.curr_date_to.getDate());
+            return ($scope.curr_date_from.getFullYear() < $scope.curr_date_to.getFullYear() || 
+                    ($scope.curr_date_from.getFullYear() == $scope.curr_date_to.getFullYear() &&
+                        $scope.curr_date_from.getMonth() < $scope.curr_date_to.getMonth()) ||
+                    ($scope.curr_date_from.getFullYear() == $scope.curr_date_to.getFullYear() &&
+                        $scope.curr_date_from.getMonth() == $scope.curr_date_to.getMonth() &&
+                        $scope.curr_date_from.getDate() <= $scope.curr_date_to.getDate()));
+        }
 
         /* permissions determiner functions */
 
@@ -757,6 +792,7 @@ var ccapp = angular.module("ccapp", []);
                 $scope.setLoggedInUserInfo(false, resp.data);
                 $scope.setCurrUserInfo(false, resp.data);
                 $scope.setTotalDataByUserType();
+                $scope.resetCalFilters();
             },function(error){
                 console.log(error);
                 console.log('There was an error: ' + authResult['error']);
@@ -808,8 +844,10 @@ var ccapp = angular.module("ccapp", []);
             });
         };
 
-        // auto get and assign functions once at start
-        (function() {$scope.getAndAssignTypes();})();
+        // auto get and assign functions at start
+        (function() {
+            $scope.getAndAssignTypes();
+        })();
     });
 })(ccapp);
 

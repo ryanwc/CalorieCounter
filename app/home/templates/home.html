@@ -29,7 +29,17 @@
 		<div class="outerdiv mainviewdiv" id="caloriediv" ng-show="viewingCalories">
 
 			<div class="listdiv">
-				<span id="expcalheader">//expCalMessage// <span ng-show="expIsSet">Color calories by meets daily goal: <button class="click" type="button" ng-click="toggleCalColor()">toggle</button></span></span>
+				<span id="expcalheader">//expCalMessage//<br>
+					<span ng-show="expIsSet">Color calories by meets daily goal: <button class="click" type="button" ng-click="toggleCalColor()">toggle</button></span>
+				</span>	
+				<div class="filters">
+					<span>Date from: <input type="date" ng-model="curr_date_from"> | Date to: <input type="date" ng-model="curr_date_to"></span>
+					<br>
+					<span>Time from: //curr_time_from//:00 <input type="range" min="0" max="23" ng-model="curr_time_from"> | Time to: //curr_time_to//:00 <input type="range" min="0" max="23" ng-model="curr_time_to"></span>
+					<br>
+					<span class="invalid" ng-show="!isValidFilter()">'from' cannot be later than 'to'<br></span>
+					<button class="click" type="button" ng-click="resetCalFilters()">reset filters</button>
+				</div>
 				<br>
 				<span class="listheader"><button class="click addclick" type="button" ng-click="togglePostCalorie(true, true)">Add a calorie</button>, or click a calorie to view/edit</span>
 				<div class="listlist">
