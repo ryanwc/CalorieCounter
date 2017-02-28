@@ -28,12 +28,12 @@
 		<!-- extension: sub angular views in and out based on controldiv selections -->
 		<div class="outerdiv mainviewdiv" id="caloriediv" ng-show="viewingCalories">
 
-			<div id="calorielistdiv">
+			<div class="listdiv">
 				<span id="expcalheader">//expCalMessage// <span ng-show="expIsSet">Color calories by meets daily goal: <button class="click" type="button" ng-click="toggleCalColor()">toggle</button></span></span>
 				<br>
-				<span id="calorielistheader"><button class="click addclick" type="button" ng-click="togglePostCalorie(true, true)">Add a calorie</button>, or click a calorie to view/edit</span>
-				<div id="calorielistlist">
-					<span class="calorieslistcal" ng-repeat="cal in curr_cals">
+				<span class="listheader"><button class="click addclick" type="button" ng-click="togglePostCalorie(true, true)">Add a calorie</button>, or click a calorie to view/edit</span>
+				<div class="listlist">
+					<span class="listitem" ng-repeat="cal in curr_cal_dict">
 			      		<button class="click calbutton" id="cal-//cal.id//" type="button" ng-click="toggleViewCalorie(true, cal.id)">Calorie //cal.id//:</button> <span>Date: //cal.date_str//; Amount: //cal.amnt//</span>
 			      		<br>
 			      	</span>
@@ -77,10 +77,10 @@
 
 		<div class="outerdiv mainviewdiv" id="userdiv" ng-show="viewingUsers">
 
-			<div id="userlistdiv" ng-show="canCRUDUsers()">
-				<span id="userlistheader">Click a user to view/edit</span>
-				<div id="userlistlist">
-					<span class="userlistuser" ng-repeat="user in curr_users">
+			<div class="listdiv" ng-show="canCRUDUsers()">
+				<span class="listheader"><button class="click addclick" type="button" ng-click="togglePostUser(true, true)">Add a user</button>, or click a user to view/edit</span>
+				<div class="listlist">
+					<span class="lististem" ng-repeat="user in curr_user_dict">
 			      		<button class="click userbutton" id="user-//user.id//" type="button" ng-click="toggleViewUser(true, user.id)">User //user.id//:</button> <span>//user.username//</span>
 			      		<br>
 			      	</span>
@@ -96,25 +96,26 @@
 		      	<br>
 		      	<span>Expected cals/day: //curr_user.exp_cal_day//</span>
 		      	<br>
-		      	<span>User type: //curr_user.user_type//</span>
+		      	<span>User type: //user_type_dict[curr_user.user_type_id].name//</span>
 		      	<br>
-		      	<button class="click editclick" type="button" ng-click="toggleEditUser(true, false)">edit profile</button> | <button class="click deleteclick" ng-click="deleteUser()">delete user</button> | <button type="button" ng-click="toggleViewUser(false)">close profile</button>
+		      	<button class="click" type="button" ng-show="canCRUDAll()" ng-click="toggleViewCalories(true, curr_user.id)">user calories</button> | <button class="click editclick" type="button" ng-click="togglePostUser(true, false)">edit profile</button> | <button class="click deleteclick" ng-click="deleteUser()">delete user</button> | <button type="button" ng-click="toggleViewUser(false)">close profile</button>
 			</div>
 
-			<div class="cruddiv" id="edituserdiv" ng-show="editingUser">
-				<form id="edituserform" ng-submit="editUser()">
+			<div class="cruddiv" id="edituserdiv" ng-show="addingUser || editingUser">
+				<form id="postuserform" ng-submit="postUser()">
+					<span class="formheader" ng-show="addingUser">Add user details and submit.</span>
 					<span class="formheader" ng-show="editingUser">Change profile as desired and submit.</span>
 					<br>
-					<span class="attridentifier">Username: </span><input type="text" ng-model="edit_user.username">
+					<span class="attridentifier">Username: </span><input type="text" ng-model="post_user.username">
 					<br> 
-					<span class="attridentifier">Email: </span><input type="text" ng-model="edit_user.email">
+					<span class="attridentifier">Email: </span><input type="text" ng-model="post_user.email">
 					<br>
-					<span class="attridentifier">Expected cals/day: </span><input type="text" ng-model="edit_user.exp_cal_day">
+					<span class="attridentifier">Expected cals/day: </span><input type="text" ng-model="post_user.exp_cal_day">
 					<br>
-					<span class="attridentifier" ng-show="canCRUDUsers()">User Type: <select ng-show="canCRUDUsers()" ng-init="edit_user.user_type = type.id" ng-model="edit_user.user_type" ng-options="type.name for type in user_type_dict track by type.id">--user type--</select>(was //user_type_dict[curr_user.user_type].name//)</span>
+					<span class="attridentifier" ng-show="canCRUDAll()">User Type: <select ng-show="canCRUDUsers()" ng-init="post_user.user_type_id = type.id" ng-model="post_user.user_type_id" ng-options="type.name for type in user_type_dict track by type.id">--user type--</select></span>
 					<br>
 					<input type="submit" value="submit">
-					<button class="click" type="button" ng-click="toggleEditUser(false)">cancel</button>
+					<button class="click" type="button" ng-click="togglePostUser(false, addingUser)">cancel</button>
 				</form>
 			</div>
 
@@ -124,13 +125,14 @@
 		<!-- high-level controls and signin/out -->
 		<div class="outerdiv" id="controldiv">
 			<div class='signedIn-//isSignedIn()//' ng-show="isSignedIn()">
-				<span id='signInMessage'>Signed in as //user_type_dict[log_user.user_type].name// //log_user.username//</span>
+				<span id='signInMessage'>Signed in as //user_type_dict[log_user.user_type_id].name// //log_user.username//</span>
 				<div id="controlbuttons">
 					<button class="click" type="button" ng-click="toggleViewUser(true, log_user.id)" ng-show="canCRUDSelf()">Your profile</button> <button class="click" type="button" ng-click="toggleViewUsers(false)" ng-show="viewingUsers">Close profile view</button>
 					<br>
-					<button class="click" type="button" ng-click="toggleViewCalories(true, log_user.id)" ng-show="canCRUDSelf()">Your calories</button> <button class="click" type="button" ng-click="toggleViewCalories(false)" ng-show="viewingCalories">Close calorie view</button>
+					<button class="click" type="button" ng-click="toggleViewUsers(false);toggleViewCalories(true, log_user.id);" ng-show="canCRUDSelf()">Your calories</button> <button class="click" type="button" ng-click="toggleViewCalories(false)" ng-show="viewingCalories">Close calorie view</button>
 					<br>
 					<button class="click" type="button" ng-click="toggleViewUsers(true)" ng-show="canCRUDUsers()">Manage users <span ng-show="canCRUDAll()">and calories</span></button>
+					<br>
 			    	<button class="click" type="button" ng-click="signout()">Sign out</button>
 			    </div>
 			</div>

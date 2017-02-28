@@ -20,14 +20,20 @@ def pass_fail_cal(calorie):
     # (met if no exp_total set)
     return daytotal, daytotal <= user.exp_cal_day or user.exp_cal_day == 0
 
-def isAuthorizedCalAction(user_id, cruder_user_id, cruder_user_type_id):
+def canSetPermissions(cruder_user_type_id):
+    """Return whether the cruder_user_id in user has permissions to set
+    user permissions.
+    """
+    return DataManager.get_user_type(user_type_id=cruder_user_type_id).CRUD_all
+
+def canCalorieCRUD(user_id, cruder_user_id, cruder_user_type_id):
     """Return whether the cruder_user_id in user has permissions for calorie 
     actions on calories owned by user_id.
     """
     return user_id == cruder_user_id or \
             DataManager.get_user_type(user_type_id=cruder_user_type_id).CRUD_all
 
-def isAuthorizedUserAction(user_id, cruder_user_id, cruder_user_type_id):
+def canUserCRUD(user_id, cruder_user_id, cruder_user_type_id):
     """Return whether the cruder_user_id in user has permissions for user profile 
     actions on user_id.
     """

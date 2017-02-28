@@ -91,7 +91,7 @@ def get_user():
 
     if request.args.get("username") and \
         len(request.args.get("username")) > 0:
-        username = int(request.args.get("username"))
+        username = request.args.get("username")
     else:
         username = None
 
@@ -102,7 +102,7 @@ def get_user():
         email = None
 
     # check permissions
-    if not isAuthorizedUserAction(user_id, 
+    if not utils.canUserCRUD(user_id, 
             login_session["user_id"], login_session["user_type_id"]):
         response = make_response(json.\
             dumps('Not authorized to get other user data'), 403)
@@ -122,6 +122,73 @@ def get_user():
         return jsonify(Data=[])
 
 
+@ccapp.route('/add_user', methods=['POST'])
+def add_user():
+    """Endpoint for adding user records to the database.
+
+    Args that can be sent as part of http query string:
+        email: the email of the user to get
+        username: the username of the user to get
+    Return:
+        A JSON representing the database version(s) of the user(s) specified
+        by the given arguments
+    """
+    print request.args
+    if not utils.is_logged_in():
+        response = make_response(json.\
+            dumps('Must sign in to CRUD'), 403)
+        response.headers['Content-Type'] = 'application/json'
+
+    if request.args.get("username") and \
+        len(request.args.get("username")) > 0:
+        username = request.args.get("username")
+    else:
+        username = None
+
+    if request.args.get("email") and \
+        len(request.args.get("email")) > 0:
+        email = request.args.get("email")
+    else:
+        email = None
+
+    if request.args.get("exp_cal_day") and \
+        len(request.args.get("exp_cal_day")) > 0:
+        exp_cal_day = int(request.args.get("exp_cal_day"))
+    else:
+        exp_cal_day = None 
+
+    if request.args.get("user_type_id") and \
+        len(request.args.get("user_type_id")) > 0:
+        user_type_id = int(request.args.get("user_type_id"))
+    else:
+        user_type_id = None   
+
+    # check permissions
+    if not utils.canUserCRUD(None, 
+            login_session["user_id"], login_session["user_type_id"]):
+        response = make_response(json.\
+            dumps('Not authorized to get other user data'), 403)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    if user_type_id and not utils.canSetPermissions(login_session["user_type_id"]):
+        response = make_response(json.\
+            dumps('Not authorized to set user perissions'), 403)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    user_id = DataManager.add_user(username, email, 
+        exp_cal_day=exp_cal_day, user_type_id=user_type_id)
+    user = DataManager.get_user(user_id=user_id)
+
+    if user:
+        return jsonify(Data=[user.serialize])
+    else:
+        response = make_response(json.dumps('User creation error'), 500)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+
 @ccapp.route('/edit_user', methods=['POST'])
 def edit_user():
     """Endpoint for editing user records in the database.
@@ -131,7 +198,7 @@ def edit_user():
         email: the new email
         username: the new username
         exp_cal_day the new expected calories / day
-        user_type: the new user type
+        user_type_id: the id of the new user type
     Return:
         A JSON representing the given user edited as specified
     """
@@ -145,7 +212,7 @@ def edit_user():
         len(request.args.get("user_id")) > 0:
         user_id = int(request.args.get("user_id"))
     else:
-        response = make_response(json.dumps('Must user id'), 401)
+        response = make_response(json.dumps('Must provide user id'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response  
 
@@ -167,19 +234,30 @@ def edit_user():
     else:
         exp_cal_day = None
 
-    if request.args.get("user_type") and \
-        len(request.args.get("user_type")) > 0:
-        user_type = int(request.args.get("user_type"))
+    if request.args.get("user_type_id") and \
+        len(request.args.get("user_type_id")) > 0:
+        user_type_id = int(request.args.get("user_type_id"))
     else:
-        user_type = None     
+        user_type_id = None     
 
+    print user_id
     userCheck = DataManager.get_user(user_id=user_id)
 
+    print userCheck
+
     # check permissions
-    if not utils.isAuthorizedUserAction(userCheck.id, 
+    # if the logged in user can't do user actions
+    if not utils.canUserCRUD(userCheck.id, 
             login_session["user_id"], login_session["user_type_id"]):
         response = make_response(json.\
             dumps('Not authorized for actions on given user'), 403)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # if the logged in user is trying to set user permissions and can't
+    if user_type_id and not utils.canSetPermissions(login_session["user_type_id"]):
+        response = make_response(json.\
+            dumps('Not authorized to set user permissions'), 403)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -216,11 +294,23 @@ def delete_user():
         user = DataManager.get_user(user_id=user_id)
 
         # check permissions
-        if not utils.isAuthorizedUserAction(user.id, 
+        if not utils.canUserCRUD(user.id, 
             login_session["user_id"], login_session["user_type_id"]):
 
             response = make_response(json.\
                 dumps('Not authorized for actions on given user'), 403)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+        # if the user to be deleted can crud all, but login user can't
+        login_crud_all = DataManager.\
+            get_user_type(user_type_id=login_session["user_type_id"]).CRUD_all
+        delete_crud_all = DataManager.\
+            get_user_type(user_type_id=user.user_type_id).CRUD_all
+
+        if delete_crud_all and not login_crud_all:
+            response = make_response(json.\
+                dumps('Not authorized to delete this user'), 403)
             response.headers['Content-Type'] = 'application/json'
             return response
 
@@ -271,7 +361,7 @@ def get_calorie():
         calorie_id = int(request.args.get("calorie_id"))
         # check permissions for reading this calorie
         calorie = DataManager.get_calorie(calorie_id=calorie_id)
-        if not utils.isAuthorizedCalAction(calorie.user_id, 
+        if not utils.canCalorieCRUD(calorie.user_id, 
                 login_session["user_id"], login_session["user_type_id"]):
             response = make_response(json.\
                 dumps('Not authorized for cal actions for given user'), 403)
@@ -284,7 +374,7 @@ def get_calorie():
         len(request.args.get("user_id")) > 0:
         user_id = int(request.args.get("user_id"))
         # check perissions for reading this user's calories
-        if not utils.isAuthorizedCalAction(user_id, 
+        if not utils.canCalorieCRUD(user_id, 
                 login_session["user_id"], login_session["user_type_id"]):
             response = make_response(json.\
             dumps('Not authorized for cal actions for given user'), 403)
@@ -371,7 +461,7 @@ def add_calorie():
         len(request.args.get("user_id")) > 0:
 
         user_id = int(request.args.get("user_id"))
-        if not utils.isAuthorizedCalAction(user_id, 
+        if not utils.canCalorieCRUD(user_id, 
                 login_session["user_id"], login_session["user_type_id"]):
             response = make_response(json.\
                 dumps('Not authorized for cal actions for given user'), 403)
@@ -494,14 +584,14 @@ def edit_calorie():
 
     # check permissions
     calorie = DataManager.get_calorie(calorie_id=calorie_id)
-    if not utils.isAuthorizedCalAction(calorie.user_id, 
+    if not utils.canCalorieCRUD(calorie.user_id, 
             login_session["user_id"], login_session["user_type_id"]):
         response = make_response(json.\
             dumps('Not authorized for cal actions for given user'), 403)
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    if user_id and not utils.isAuthorizedCalAction(user_id, 
+    if user_id and not utils.canCalorieCRUD(user_id, 
             login_session["user_id"], login_session["user_type_id"]):
         response = make_response(json.\
             dumps('Not authorized for cal actions for given user'), 403)
@@ -549,7 +639,7 @@ def delete_calorie():
         calorie = DataManager.get_calorie(calorie_id=calorie_id)
 
         # check permissions
-        if not utils.isAuthorizedCalAction(calorie.user_id, 
+        if not utils.canCalorieCRUD(calorie.user_id, 
                 login_session["user_id"], login_session["user_type_id"]):
 
             response = make_response(json.\
@@ -565,7 +655,7 @@ def delete_calorie():
             return jsonify({"Message": "Successful deletion",
                             "Post": "deletion",
                             "Model": "calorie",
-                            "Id": calorie_id,
+                            "id": calorie_id,
                             "daytotal": daytotal,
                             "date": date})
         else:
@@ -649,7 +739,7 @@ def gconnect():
 
         return jsonify({'username': login_session['username'],
                     'user_id': login_session['user_id'],
-                    'user_type': login_session['user_type_id'],
+                    'user_type_id': login_session['user_type_id'],
                     'email': login_session['email'],
                     'exp_cal_day': login_session['exp_cal_day'],
                     'Access-Control-Allow-Origin': '*'})
@@ -672,7 +762,7 @@ def gconnect():
 
     return jsonify({'username': login_session['username'],
                     'id': login_session['user_id'],
-                    'user_type': login_session['user_type_id'],
+                    'user_type_id': login_session['user_type_id'],
                     'email': login_session['email'],
                     'exp_cal_day': login_session['exp_cal_day'],
                     'Access-Control-Allow-Origin': '*'})

@@ -18,7 +18,7 @@ def get_calorie_db_session():
     return session
 
 
-def add_user(username, email, exp_cal_day=None, user_type=None):
+def add_user(username, email, exp_cal_day=None, user_type_id=None):
     """Add a user to the database.
 
     Args:
@@ -26,20 +26,21 @@ def add_user(username, email, exp_cal_day=None, user_type=None):
         email: the email of the user to add
         exp_cal_day: the number of calories the user expects
             to consume per day
+        user_type_id: the user type for the user to add
     Returns:
         Returns the user id of the created user record
     """
     session = get_calorie_db_session()
 
-    if not user_type:
-        user_type = get_user_type(CRUD_self=True, 
-            CRUD_users=False, CRUD_all=False)[0]
+    if user_type_id is None:
+        user_type_id = get_user_type(CRUD_self=True, 
+            CRUD_users=False, CRUD_all=False)[0].id
 
     if not exp_cal_day:
         exp_cal_day = 0
 
     user = User(username=username, email=email, exp_cal_day=exp_cal_day, 
-        user_type=user_type)
+        user_type_id=user_type_id)
 
     session.add(user)
     session.flush()
@@ -118,13 +119,17 @@ def get_user(user_id=None, username=None, email=None):
     """
     session = get_calorie_db_session()
 
-    if user_id:
+    print "here1"
+    print user_id
+    if user_id is not None:
+        print "here2"
         user = session.query(User).filter_by(id=user_id).first()
     elif email:
         user = session.query(User).filter_by(email=email).first()
     else:
         user = session.query(User).order_by(User.id).all()
 
+    print user
     session.close()
     return user
 
@@ -148,7 +153,7 @@ def get_user_type(user_type_id=None, name=None, CRUD_self=None,
     """
     session = get_calorie_db_session()
 
-    if user_type_id:
+    if user_type_id is not None:
         user_type = session.query(UserType).filter_by(id=user_type_id).first()
     elif name:
         user_type = session.query(UserType).filter_by(name=name).first()
@@ -165,15 +170,15 @@ def get_user_type(user_type_id=None, name=None, CRUD_self=None,
     return user_type
 
 
-def get_calorie(calorie_id=None, user_id=None, user_type=None,
+def get_calorie(calorie_id=None, user_id=None, user_type_id=None,
                 date_from=datetime.date.min, date_to=datetime.date.max, 
                 time_from=datetime.time.min, time_to=datetime.time.max):
     """Get the calories record(s) matching the given arguments.
     Defaults to returning calories recorded at all possible date and times.
 
     Args:
-        calorie_id: A list of calorie ids
-        user_ids: A list of user ids
+        calorie_id: A calorie id
+        user_id: A user id
         date_from: A starting date
         date_to: An ending date
         time_from: A starting time
@@ -184,16 +189,16 @@ def get_calorie(calorie_id=None, user_id=None, user_type=None,
     """
     session = get_calorie_db_session()
 
-    if calorie_id:
+    if calorie_id is not None:
         calorie = session.query(Calorie).filter_by(id=calorie_id).first()
-    elif user_id:
+    elif user_id is not None:
         calorie = session.query(Calorie).\
             filter(Calorie.user_id == user_id,
                    Calorie.date >= date_from,
                    Calorie.date <= date_to,
                    Calorie.time >= time_from,
                    Calorie.time <= time_to).all()
-    elif user_type:
+    elif user_type_id is not None:
         calorie = session.query(Calorie).\
             filter(Calorie.user_type_id == user_type_id,
                    Calorie.date >= date_from,
@@ -288,7 +293,7 @@ def edit_calorie(calorie_id, user_id=None, date=None, time=None,
 
     calorie = session.query(Calorie).filter_by(id=calorie_id).first()
 
-    if user_id:
+    if user_id is not None:
         calorie.user_id = user_id
     
     if date:

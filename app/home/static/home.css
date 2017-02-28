@@ -75,6 +75,25 @@ li {
 
 }
 
+.listdiv {
+
+}
+.listheader {
+
+}
+.listlist {
+	background-color: #b3b3b3;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-top: 2px;
+	height: 50px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	padding-bottom: 2px;
+	border: 1px solid black;
+	overflow-y: scroll;
+}
+
 .signOut {
 	border: 2px solid;
 	border-radius: 5px;
@@ -119,24 +138,6 @@ li {
 }
 #expcalheader {
 	font-size: .8em;	
-}
-#calorielistdiv {
-
-}
-#calorielistheader {
-
-}
-#calorielistlist {
-	background-color: #b3b3b3;
-	padding-left: 15px;
-	padding-right: 15px;
-	padding-top: 2px;
-	height: 50px;
-	margin-top: 5px;
-	margin-bottom: 5px;
-	padding-bottom: 2px;
-	border: 1px solid black;
-	overflow-y: scroll;
 }
 
 #controldiv	{

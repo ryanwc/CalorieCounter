@@ -56,7 +56,7 @@ class User(Base):
                         'id': self.id,
                         'email': self.email,
                         'exp_cal_day': self.exp_cal_day,
-                        'user_type': self.user_type_id,
+                        'user_type_id': self.user_type_id,
                 }
 
 
