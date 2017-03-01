@@ -537,6 +537,26 @@ var ccapp = angular.module("ccapp", []);
             }
         };
 
+        $scope.rescoreCals = function(editedUser) {
+
+            console.log("rescoring");
+            // iterate thru cals
+            for (var id in $scope.curr_cal_dict) {
+                // skip loop if the property is from prototype
+                if (!$scope.curr_cal_dict.hasOwnProperty(id)) continue;
+
+                var calorie = $scope.curr_cal_dict[id];
+
+                console.log("old cal is");
+                console.log(calorie);
+
+                if (calorie.user_id != editedUser.id) continue;
+
+                calorie.meets = calorie.daytotal <= editedUser.exp_cal_day ? true : false;
+                $scope.curr_cal_dict[id] = calorie;
+            }          
+        };
+
         // push calories from server to the current calorie list
         $scope.pushCalsFromServer = function(data) {
 
@@ -748,6 +768,10 @@ var ccapp = angular.module("ccapp", []);
             console.log($scope.post_user.user_type_id);
             console.log(user_type_id);
 
+            var exp_change = parseInt(exp_cal_day) == parseInt($scope.curr_user.exp_cal_day);
+            console.log("old" + parseInt($scope.curr_user.exp_cal_day));
+            console.log("new" + parseInt(exp_cal_day));
+
             $http({
                 method:'POST',
                 url: "/edit_user?user_id="+user_id+"&username="+username+"&email="+email+"&exp_cal_day="+exp_cal_day+"&user_type_id="+user_type_id,
@@ -757,6 +781,9 @@ var ccapp = angular.module("ccapp", []);
             })
             .then(function(resp){
                 console.log(resp);
+                if (resp.data["Data"][0].exp_cal_day != $scope.curr_user.exp_cal_day) {
+                    $scope.rescoreCals(resp.data["Data"][0]);
+                }
                 $scope.onEditSuccessful(resp.data["Data"], "user");
                 window.alert("Successfully edited user");
             },function(error){
