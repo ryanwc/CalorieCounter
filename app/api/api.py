@@ -155,7 +155,7 @@ def add_user():
 
     if request.args.get("email") and \
         len(request.args.get("email")) > 0:
-        email = bleach(request.args.get("email"))
+        email = bleach.clean(request.args.get("email"))
         if not utils.is_email(email):
             response = make_response(json.\
                 dumps('email invalid'), 400)
@@ -434,6 +434,7 @@ def get_calorie():
     if request.args.get("date_to") and \
         len(request.args.get("date_to")) > 0:
         dates = request.args.get(bleach.clean("date_to")).split("-")
+        date_to = datetime.date(int(dates[0]), int(dates[1]), int(dates[2]))
     else:
         date_to = datetime.date.max
 
