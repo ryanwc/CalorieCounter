@@ -213,7 +213,7 @@ def edit_user():
     """Endpoint for editing user records in the database.
 
     Args that can be sent as part of http query string:
-        user_id: the id of the user to edit
+        user_id: the id of the user to edit REQUIRED
         email: the new email
         username: the new username
         exp_cal_day the new expected calories / day
@@ -763,24 +763,6 @@ def delete_calorie():
 
 # login/logout endpoints
 
-@ccapp.route('/gaccess', methods=['GET'])
-def gaccess():
-    """Get the URL string for initiating Google OAuth signin.
-    Navigate to the 
-
-    Args that can be sent as part of http query string:
-        calorie_id: the id of the calorie to delete
-    Return:
-        A JSON with one entry: {g_access_url: "the URL to enter to grant Calorie Counter permissions"}.
-    """
-    oauth_flow = oauth2client.client.OAuth2WebServerFlow(client_id='104598252187-0rbq64ac895hj3pkc0unepar2n1cf7j9.apps.googleusercontent.com',
-        client_secret='gEdnnUW4OpBS0QnP8-vHoSy6',
-        scope=["https://www.googleapis.com/auth/plus.me", "https://www.googleapis.com/auth/userinfo.email"],
-        redirect_uri="http://localhost:5000/gconnect",
-        access_type="offline", 
-        response_type="code")
-
-    return jsonify({"g_access_url": oauth_flow.step1_get_authorize_url()})
 
 @ccapp.route('/gconnect', methods=['POST'])
 def gconnect():
