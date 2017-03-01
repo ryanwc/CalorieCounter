@@ -70,6 +70,7 @@ def delete_user_type():
 def get_user():
     """Endpoint for serving user records from the database.
 
+    Args are optional unless noted.
     Args that can be sent as part of http query string:
         user_id: the id of the user to get
         email: the email of the user to get
@@ -126,9 +127,12 @@ def get_user():
 def add_user():
     """Endpoint for adding user records to the database.
 
+    Args are optional unless noted.
     Args that can be sent as part of http query string:
-        email: the email of the user to get
-        username: the username of the user to get
+        email: the email of the user (required)
+        username: the username of the user (required)
+        user_type_id: the type of user to add
+        exp_cal_day: the expected calories / day of the user
     Return:
         A JSON representing the database version(s) of the user(s) specified
         by the given arguments
@@ -212,6 +216,7 @@ def add_user():
 def edit_user():
     """Endpoint for editing user records in the database.
 
+    Args are optional unless noted.
     Args that can be sent as part of http query string:
         user_id: the id of the user to edit REQUIRED
         email: the new email
@@ -313,7 +318,7 @@ def delete_user():
     """Endpoint for deleting user records from the database.
 
     Args that can be sent as part of http query string:
-        user_id: the id of the user to delete
+        user_id: the id of the user to delete (REQUIRED)
     Return:
         A JSON representing deletion success or failure
     """
@@ -371,6 +376,7 @@ def delete_user():
 def get_calorie():
     """Endpoint for serving calorie records from the database.
 
+    All args are optional.
     Args that can be sent as part of http query string:
         calorie_id: the id of the calorie to get
         user_id: the user id of the calorie's owner
@@ -480,6 +486,7 @@ def get_calorie():
 def add_calorie():
     """Endpoint for adding calorie records in the database.
 
+    All args are required.
     Args that can be sent as part of http query string:
         user_id: the calorie's user id
         date: the calorie's date. must be given in 'YYYY-MM-DD' format
@@ -586,8 +593,9 @@ def add_calorie():
 def edit_calorie():
     """Endpoint for editing calorie records in the database.
 
+    Args are optional unless noted.
     Args that can be sent as part of http query string:
-        calorie_id: the id of the calorie to edit
+        calorie_id: the id of the calorie to edit (REQUIRED)
         user_id: the new user id
         date: the new date. must be given in 'YYYY-MM-DD' format
         time: the new time. must be given as an hour, from 0 <= h <= 24
@@ -709,7 +717,7 @@ def delete_calorie():
     """Endpoint for deleting calorie records from the database.
 
     Args that can be sent as part of http query string:
-        calorie_id: the id of the calorie to delete
+        calorie_id: the id of the calorie to delete (REQUIRED)
     Return:
         A JSON representing deletion success or failure, with success
         representing the possibly new calorie total for that day so the client 
@@ -767,6 +775,8 @@ def delete_calorie():
 @ccapp.route('/gconnect', methods=['POST'])
 def gconnect():
     """Ajax endpoint for google sign in authentication.
+
+    REQUIRED: Google authorization code to be sent as 'data' in the request.
     """
     # confirm entity with correct 3rd party credentials is same entity 
     # that is trying to login from the current login page's session.
