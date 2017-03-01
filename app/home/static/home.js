@@ -36,7 +36,10 @@ var ccapp = angular.module("ccapp", []);
             amnt: "",
             text: "",
             meets: "",
-            daytotal: ""
+            daytotal: "",
+            old_date: "",
+            old_date_meets: "",
+            old_date_daytotal: ""
         };
 
         $scope.post_cal = {
@@ -49,7 +52,10 @@ var ccapp = angular.module("ccapp", []);
             amnt: "",
             text: "",
             meets: "",
-            daytotal: ""
+            daytotal: "",
+            old_date: "",
+            old_date_meets: "",
+            old_date_daytotal: ""
         };
 
         $scope.curr_user = {
@@ -57,7 +63,7 @@ var ccapp = angular.module("ccapp", []);
             username: "",
             email: "",
             user_type_id: "",
-            exp_cal_day: "",         
+            exp_cal_day: ""         
         };
 
         $scope.post_user = {
@@ -231,6 +237,11 @@ var ccapp = angular.module("ccapp", []);
             $scope.curr_cal.time = isClear ? "" : data.time;
             $scope.curr_cal.amnt = isClear ? "" : data.amnt;
             $scope.curr_cal.text = isClear ? "" : data.text;
+            $scope.curr_cal.meets = isClear ? "" : data.meets;
+            $scope.curr_cal.daytotal = isClear ? "" : data.daytotal;
+            $scope.curr_cal.old_date = isClear ? "" : data.old_date;
+            $scope.curr_cal.old_date_meets = isClear ? "" : data.old_date_meets;
+            $scope.curr_cal.old_date_daytotal = isClear ? "" : data.old_date_daytotal;
             console.log("curr cal is");
             console.log($scope.curr_cal);
         };
@@ -239,6 +250,8 @@ var ccapp = angular.module("ccapp", []);
         $scope.toggleViewCalories = function(isShow, userID) {
             if (isShow) {
                 console.log($scope.curr_user_dict);
+                console.log(userID);
+                console.log($scope.curr_user_dict[parseInt(userID)]);
                 $scope.setCurrUserInfo(false, $scope.curr_user_dict[parseInt(userID)]);
                 $scope.viewingCalories = true;
             }
@@ -300,6 +313,11 @@ var ccapp = angular.module("ccapp", []);
             $scope.post_cal.time = isClear ? "" : $scope.curr_cal.time;
             $scope.post_cal.amnt = isClear ? "" : $scope.curr_cal.amnt;
             $scope.post_cal.text = isClear ? "" : $scope.curr_cal.text;
+            $scope.post_cal.meets = isClear ? "" : $scope.curr_cal.meets;
+            $scope.post_cal.daytotal = isClear ? "" : $scope.curr_cal.daytotal;
+            $scope.post_cal.old_date = isClear ? "" : $scope.curr_cal.old_date;
+            $scope.post_cal.old_date_meets = isClear ? "" : $scope.curr_cal.old_date_meets;
+            $scope.post_cal.old_date_daytotal = isClear ? "" : $scope.curr_cal.old_date_daytotal;
             console.log($scope.post_cal);
         };
 
@@ -335,6 +353,7 @@ var ccapp = angular.module("ccapp", []);
             .then(function(resp){
                 console.log(resp);
                 callback(resp.data["Data"]);
+                $scope.updateCalTotals($scope.curr_cal_dict[resp.data["Data"][0].id]);
                 $scope.addingCalorie = false;
                 $scope.editingCalorie = false;
                 $scope.toggleViewCalorie(false);
@@ -364,6 +383,7 @@ var ccapp = angular.module("ccapp", []);
             })
             .then(function(resp){
                 console.log(resp);
+                $scope.updateCalTotals($scope.curr_cal_dict[resp.data["Data"][0].id]);
                 $scope.onEditSuccessful(resp.data["Data"], "calorie");
                 window.alert("Successfully edited calorie");
             },function(error){
@@ -410,6 +430,7 @@ var ccapp = angular.module("ccapp", []);
             })
             .then(function(resp){
                 console.log(resp);
+                $scope.updateCalTotals($scope.curr_cal_dict[resp.data.id], "delete");
                 $scope.onDeleteSuccessful(resp.data);
                 window.alert("Successfully deleted calorie");
             },function(error){
@@ -460,7 +481,10 @@ var ccapp = angular.module("ccapp", []);
                 amnt: data[0].num_calories,
                 text: data[0].text,
                 meets: data[0].meets,
-                daytotal: parseInt(data[0].daytotal)
+                daytotal: parseInt(data[0].daytotal),
+                old_date: data[0].old_date,
+                old_date_meets: data[0].old_date_meets,
+                old_date_daytotal: data[0].old_date_daytotal
             };
             
             console.log("before edit");
@@ -469,6 +493,48 @@ var ccapp = angular.module("ccapp", []);
             $scope.curr_cal_dict[data[0].id] = cal;     
             console.log("after edit");
             console.log($scope.curr_cal_dict[data[0].id]);
+        };
+
+        // edit daytotal and passing status of current calories
+        // based on modified calorie from server holding new info
+        // about totals
+        $scope.updateCalTotals = function(crudResult, crudType) {
+
+            console.log(crudResult);
+            console.log("updating");
+            // iterate thru cals
+            for (var id in $scope.curr_cal_dict) {
+                // skip loop if the property is from prototype
+                if (!$scope.curr_cal_dict.hasOwnProperty(id)) continue;
+
+                var calorie = $scope.curr_cal_dict[id];
+
+                console.log("old cal is");
+                console.log(calorie);
+                if (!crudResult.user_id == calorie.user_id) continue;
+
+                // if it was an edit, delete or add on this day
+                if (crudResult.date_str === calorie.date_str) {
+
+                    console.log("same date");
+                    // if it was a deletion
+                    if (crudType === "delete") {
+                        calorie.daytotal = calorie.daytotal - crudResult.amnt;
+                        calorie.meets = $scope.expIsSet ? calorie.daytotal < $scope.curr_user.exp_cal_day : true;                  
+                    }
+                    else {
+                        calorie.daytotal = crudResult.daytotal;
+                        calorie.meets = crudResult.meets;
+                    }
+                }
+                else if (crudResult.old_date && crudResult.old_date == calorie.date_str) {
+                    // it was an edit that took cals from this day
+                    calorie.daytotal = crudResult.old_date_daytotal;
+                    calorie.meets = crudResult.old_date_meets;
+                }
+
+                $scope.curr_cal_dict[id] = calorie;
+            }
         };
 
         // push calories from server to the current calorie list
@@ -488,8 +554,11 @@ var ccapp = angular.module("ccapp", []);
                     time: parseInt(data[i].time.split(":")),
                     amnt: data[i].num_calories,
                     text: data[i].text,
-                    meets: data[0].meets,
-                    daytotal: parseInt(data[0].daytotal)
+                    meets: data[i].meets,
+                    daytotal: parseInt(data[i].daytotal),
+                    old_date: data[i].old_date,
+                    old_date_meets: data[i].old_date_meets,
+                    old_date_daytotal: data[i].old_date_daytotal
                 };
 
                 $scope.curr_cal_dict[cal.id] = cal;         

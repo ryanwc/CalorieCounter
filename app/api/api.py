@@ -420,6 +420,9 @@ def get_calorie():
         sCal = calorie.serialize
         sCal["daytotal"] = daytotal
         sCal["meets"] = meets
+        sCal["old_date"] = False
+        sCal["old_date_meets"] = False
+        sCal["old_date_daytotal"] = False
         utils.pass_fail_cal(calorie)
         return jsonify(Data=[sCal])
     elif len(calorie) > 0:
@@ -428,8 +431,13 @@ def get_calorie():
         for cal in calorie:
             (daytotal, meets) = utils.pass_fail_cal(cal)
             sCal = cal.serialize
+            print sCal["date"]
+            print daytotal
             sCal["daytotal"] = daytotal
             sCal["meets"] = meets
+            sCal["old_date"] = False
+            sCal["old_date_meets"] = False
+            sCal["old_date_daytotal"] = False
             sCals.append(sCal)
         return jsonify(Data=sCals)
     else:
@@ -513,6 +521,9 @@ def add_calorie():
         sCal = calorie.serialize
         sCal["daytotal"] = daytotal
         sCal["meets"] = meets
+        sCal["old_date"] = False
+        sCal["old_date_meets"] = False
+        sCal["old_date_daytotal"] = False
         utils.pass_fail_cal(calorie)
         return jsonify(Data=[sCal])
     else:
@@ -598,17 +609,24 @@ def edit_calorie():
         response.headers['Content-Type'] = 'application/json'
         return response 
 
+    # get additional info
+    old_calorie = DataManager.get_calorie(calorie_id=calorie_id)
+    (old_daytotal, old_meets) = utils.pass_fail_cal(old_calorie)
+
     # make the update and return
     DataManager.edit_calorie(calorie_id, user_id=user_id, date=date,
         time=time, text=text, num_calories=amnt)
     calorie = DataManager.get_calorie(calorie_id=calorie_id)
+    date_changed = old_calorie.date != calorie.date
 
     if calorie:
         (daytotal, meets) = utils.pass_fail_cal(calorie)
         sCal = calorie.serialize
         sCal["daytotal"] = daytotal
         sCal["meets"] = meets
-        utils.pass_fail_cal(calorie)
+        sCal["old_date"] = old_calorie.date if date_changed else False
+        sCal["old_date_meets"] = old_meets if date_changed else False
+        sCal["old_date_daytotal"] = old_daytotal if date_changed else False
         return jsonify(Data=[sCal])
     else:
         response = make_response(json.dumps('Internal server error'), 500)
@@ -650,14 +668,19 @@ def delete_calorie():
         # update and return
         (daytotal, meets) = utils.pass_fail_cal(calorie)
         date = calorie.date
+        num_calories = DataManager.get_calorie(calorie_id).num_calories
         result = DataManager.delete_calorie(calorie_id)
         if result == 1:
             return jsonify({"Message": "Successful deletion",
                             "Post": "deletion",
                             "Model": "calorie",
                             "id": calorie_id,
+                            "num_calories": num_calories,
                             "daytotal": daytotal,
-                            "date": date})
+                            "date": date,
+                            "old_date": False,
+                            "old_date_meets": False,
+                            "old_date_daytotal": False})
         else:
             response = make_response(json.\
                 dumps('Calorie id did not match any in db'), 401)

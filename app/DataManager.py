@@ -119,10 +119,7 @@ def get_user(user_id=None, username=None, email=None):
     """
     session = get_calorie_db_session()
 
-    print "here1"
-    print user_id
     if user_id is not None:
-        print "here2"
         user = session.query(User).filter_by(id=user_id).first()
     elif email:
         user = session.query(User).filter_by(email=email).first()
@@ -188,6 +185,11 @@ def get_calorie(calorie_id=None, user_id=None, user_type_id=None,
         given, returns all calories.
     """
     session = get_calorie_db_session()
+
+    print "getting cals from "
+    print user_id
+    print date_from
+    print date_to
 
     if calorie_id is not None:
         calorie = session.query(Calorie).filter_by(id=calorie_id).first()

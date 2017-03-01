@@ -10,15 +10,23 @@ def pass_fail_cal(calorie):
     the user's daily calorie limit.
     """
     # get total for cal's day
+    print "passing or failing cals"
     user = DataManager.get_user(user_id=calorie.user_id)
     cals_on_day = DataManager.get_calorie(user_id=user.id, 
         date_from=calorie.date, date_to=calorie.date)
+    print cals_on_day
     daytotal = 0
     for cal in cals_on_day:
+        print "adding "
+        print cal.num_calories
         daytotal += cal.num_calories
 
     # (met if no exp_total set)
-    return daytotal, daytotal <= user.exp_cal_day or user.exp_cal_day == 0
+    meets = daytotal <= user.exp_cal_day or user.exp_cal_day == 0
+    print "finished"
+    print daytotal
+    print meets
+    return daytotal, meets
 
 def canSetPermissions(cruder_user_type_id):
     """Return whether the cruder_user_id in user has permissions to set
