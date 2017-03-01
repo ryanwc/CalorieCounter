@@ -111,7 +111,7 @@ def get_user():
 
     user = DataManager.get_user(user_id=user_id, username=username, email=email)
 
-    if id in user:
+    if not type(user) is list:
         # single result
         return jsonify(Data=[user.serialize])
     elif len(user) > 0:
@@ -448,7 +448,7 @@ def get_calorie():
         time_from=time_from, time_to=time_to)
 
     # if results, set daytotal and whether the calorie falls on passing day
-    if id in calorie:
+    if not type(calorie) is list:
         # single result
         (daytotal, meets) = utils.pass_fail_cal(calorie)
         sCal = calorie.serialize

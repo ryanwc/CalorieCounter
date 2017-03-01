@@ -250,6 +250,7 @@ var ccapp = angular.module("ccapp", []);
         $scope.toggleViewCalories = function(isShow, userID) {
             if (isShow) {
                 console.log($scope.curr_user_dict);
+                console.log($scope.log_user);               
                 console.log(userID);
                 console.log($scope.curr_user_dict[parseInt(userID)]);
                 $scope.setCurrUserInfo(false, $scope.curr_user_dict[parseInt(userID)]);
