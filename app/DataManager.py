@@ -126,7 +126,6 @@ def get_user(user_id=None, username=None, email=None):
     else:
         user = session.query(User).order_by(User.id).all()
 
-    print user
     session.close()
     return user
 
@@ -185,11 +184,6 @@ def get_calorie(calorie_id=None, user_id=None, user_type_id=None,
         given, returns all calories.
     """
     session = get_calorie_db_session()
-
-    print "getting cals from "
-    print user_id
-    print date_from
-    print date_to
 
     if calorie_id is not None:
         calorie = session.query(Calorie).filter_by(id=calorie_id).first()

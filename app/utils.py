@@ -2,7 +2,7 @@ from flask import flash, session as login_session
 
 from . import ccapp, DataManager
 
-import bleach, json, re
+import bleach, json, re, datetime
 
 
 def pass_fail_cal(calorie):
@@ -215,3 +215,55 @@ def is_unique(value, col_name, table_name):
             same_value = DataManager.get_user_type(name=value)
 
     return not same_value
+
+
+def is_username(username):
+    """ Return whether the given argument is a valid username
+    """
+    return len(str(username)) < 31
+
+
+def is_email(email):
+    """ Return whether the given argument is a valid email address
+    """
+    return re.match(r"[^@]+@[^@]+\.[^@]+", email)
+
+
+def is_exp_cal(exp_cal_day):
+    """ Return whether the given argument is a valid exp_cal_day
+    """
+    return int(exp_cal_day) > -1 and int(exp_cal_day) < 20000
+
+
+def is_calorie_date(date):
+    """ Return whether the given argument is a valid date
+    """
+    return isinstance(date, datetime.date)
+
+
+def is_calorie_time(time):
+    """ Return whether the given argument is a valid time
+    """
+    return isinstance(time, datetime.time)
+
+def is_calorie_amount(num):
+    """
+    """
+    return int(num > 0)
+
+
+def is_calorie_text(text):
+    """
+    """
+    return len(str(text)) < 201
+
+
+def is_user_type_id(id):
+    """
+    """
+    user_type = DataManager.get_user_type(user_type_id=id)
+    if user_type:
+        return True
+    else:
+        return False
+

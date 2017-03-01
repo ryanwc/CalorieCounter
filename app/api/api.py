@@ -5,9 +5,9 @@ from flask_cors import CORS, cross_origin
 
 from app import DataManager, ccapp, utils
 
-from oauth2client.client import FlowExchangeError
+import oauth2client.client
 
-import httplib2, requests, traceback, json, datetime
+import httplib2, requests, traceback, json, datetime, bleach
 
 api_bp = Blueprint('api', __name__)
 Api(ccapp)
@@ -133,33 +133,52 @@ def add_user():
         A JSON representing the database version(s) of the user(s) specified
         by the given arguments
     """
-    print request.args
     if not utils.is_logged_in():
         response = make_response(json.\
-            dumps('Must sign in to CRUD'), 403)
+            dumps('Must sign in to CRUD'), 400)
         response.headers['Content-Type'] = 'application/json'
 
     if request.args.get("username") and \
         len(request.args.get("username")) > 0:
-        username = request.args.get("username")
+        username = bleach.clean(request.args.get("username"))
+        if not utils.is_username(username):
+            response = make_response(json.\
+                dumps('username invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         username = None
 
     if request.args.get("email") and \
         len(request.args.get("email")) > 0:
-        email = request.args.get("email")
+        email = bleach(request.args.get("email"))
+        if not utils.is_email(email):
+            response = make_response(json.\
+                dumps('email invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         email = None
 
     if request.args.get("exp_cal_day") and \
         len(request.args.get("exp_cal_day")) > 0:
-        exp_cal_day = int(request.args.get("exp_cal_day"))
+        exp_cal_day = int(bleach.clean(request.args.get("exp_cal_day")))
+        if not utils.is_exp_cal(exp_cal_day):
+            response = make_response(json.\
+                dumps('exp_cal_day invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         exp_cal_day = None 
 
     if request.args.get("user_type_id") and \
         len(request.args.get("user_type_id")) > 0:
-        user_type_id = int(request.args.get("user_type_id"))
+        user_type_id = int(bleach.clean(request.args.get("user_type_id")))
+        if not utils.is_user_type_id(user_type_id):
+            response = make_response(json.\
+                dumps('user_type_id invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         user_type_id = None   
 
@@ -202,7 +221,6 @@ def edit_user():
     Return:
         A JSON representing the given user edited as specified
     """
-    print request.args
     if not utils.is_logged_in():
         response = make_response(json.\
             dumps('Must sign in to CRUD'), 403)
@@ -210,7 +228,7 @@ def edit_user():
 
     if request.args.get("user_id") and \
         len(request.args.get("user_id")) > 0:
-        user_id = int(request.args.get("user_id"))
+        user_id = int(bleach.clean(request.args.get("user_id")))
     else:
         response = make_response(json.dumps('Must provide user id'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -218,32 +236,49 @@ def edit_user():
 
     if request.args.get("username") and \
         len(request.args.get("username")) > 0:
-        username = request.args.get("username")
+        username = bleach.clean(request.args.get("username"))
+        if not utils.is_username(username):
+            response = make_response(json.\
+                dumps('username invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         username = None    
 
     if request.args.get("email") and \
         len(request.args.get("email")) > 0:
-        email = request.args.get("email")
+        email = bleach.clean(request.args.get("email"))
+        if not utils.is_email(email):
+            response = make_response(json.\
+                dumps('email invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         email = None
 
     if request.args.get("exp_cal_day") and \
         len(request.args.get("exp_cal_day")) > 0:
-        exp_cal_day = int(request.args.get("exp_cal_day"))
+        exp_cal_day = int(bleach.clean(request.args.get("exp_cal_day")))
+        if not utils.is_exp_cal(exp_cal_day):
+            response = make_response(json.\
+                dumps('exp_cal_day invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         exp_cal_day = None
 
     if request.args.get("user_type_id") and \
         len(request.args.get("user_type_id")) > 0:
-        user_type_id = int(request.args.get("user_type_id"))
+        user_type_id = int(bleach.clean(request.args.get("user_type_id")))
+        if not utils.is_user_type_id(user_type_id):
+            response = make_response(json.\
+                dumps('user_type_id invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         user_type_id = None     
 
-    print user_id
     userCheck = DataManager.get_user(user_id=user_id)
-
-    print userCheck
 
     # check permissions
     # if the logged in user can't do user actions
@@ -358,7 +393,7 @@ def get_calorie():
 
     if request.args.get("calorie_id") and \
         len(request.args.get("calorie_id")) > 0:
-        calorie_id = int(request.args.get("calorie_id"))
+        calorie_id = int(bleach.clean(request.args.get("calorie_id")))
         # check permissions for reading this calorie
         calorie = DataManager.get_calorie(calorie_id=calorie_id)
         if not utils.canCalorieCRUD(calorie.user_id, 
@@ -372,7 +407,7 @@ def get_calorie():
 
     if request.args.get("user_id") and \
         len(request.args.get("user_id")) > 0:
-        user_id = int(request.args.get("user_id"))
+        user_id = int(bleach.clean(request.args.get("user_id")))
         # check perissions for reading this user's calories
         if not utils.canCalorieCRUD(user_id, 
                 login_session["user_id"], login_session["user_type_id"]):
@@ -385,15 +420,14 @@ def get_calorie():
 
     if request.args.get("date_from") and \
         len(request.args.get("date_from")) > 0:
-        dates = request.args.get("date_from").split("-")
+        dates = request.args.get(bleach.clean("date_from")).split("-")
         date_from = datetime.date(int(dates[0]), int(dates[1]), int(dates[2]))
     else:
         date_from = datetime.date.min
 
     if request.args.get("date_to") and \
         len(request.args.get("date_to")) > 0:
-        dates = request.args.get("date_to").split("-")
-        date_to = datetime.date(int(dates[0]), int(dates[1]), int(dates[2]))
+        dates = request.args.get(bleach.clean("date_to")).split("-")
     else:
         date_to = datetime.date.max
 
@@ -431,8 +465,6 @@ def get_calorie():
         for cal in calorie:
             (daytotal, meets) = utils.pass_fail_cal(cal)
             sCal = cal.serialize
-            print sCal["date"]
-            print daytotal
             sCal["daytotal"] = daytotal
             sCal["meets"] = meets
             sCal["old_date"] = False
@@ -482,8 +514,13 @@ def add_calorie():
 
     if request.args.get("date") and \
         len(request.args.get("date")) > 0:
-        dates = request.args.get("date").split("-")
+        dates = bleach.clean(request.args.get("date")).split("-")
         date = datetime.date(int(dates[0]), int(dates[1]), int(dates[2]))
+        if not utils.is_calorie_date(date):
+            response = make_response(json.\
+                dumps('date invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         response = make_response(json.dumps('Must provide valid date'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -492,6 +529,11 @@ def add_calorie():
     if request.args.get("time") and \
         len(request.args.get("time")) > 0:
         time = datetime.time(int(request.args.get("time")))
+        if not utils.is_calorie_time(time):
+            response = make_response(json.\
+                dumps('time invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         response = make_response(json.dumps('Must provide valid time'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -499,7 +541,11 @@ def add_calorie():
 
     if request.args.get("text") and \
         len(request.args.get("text")) > 0:
-        text = request.args.get("text")
+        text = bleach.clean(request.args.get("text"))
+        if not utils.is_calorie_text(text):
+            response = make_response(json.dumps('text invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         response = make_response(json.dumps('Must provide valid text'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -508,6 +554,10 @@ def add_calorie():
     if request.args.get("amnt") and \
         len(request.args.get("amnt")) > 0:
         amnt = request.args.get("amnt")
+        if not utils.is_calorie_amount(amnt):
+            response = make_response(json.dumps('amount invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         response = make_response(json.dumps('Must provide valid amount'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -570,26 +620,46 @@ def edit_calorie():
 
     if request.args.get("date") and \
         len(request.args.get("date")) > 0:
-        dates = request.args.get("date").split("-")
+        dates = bleach.clean(request.args.get("date")).split("-")
         date = datetime.date(int(dates[0]), int(dates[1]), int(dates[2]))
+        if not utils.is_calorie_date(date):
+            response = make_response(json.\
+                dumps('date invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         date = None
 
     if request.args.get("time") and \
         len(request.args.get("time")) > 0:
-        time = datetime.time(int(request.args.get("time")))
+        time = datetime.time(int(bleach.clean(request.args.get("time"))))
+        if not utils.is_calorie_time(time):
+            response = make_response(json.\
+                dumps('time invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         time = None
 
     if request.args.get("text") and \
         len(request.args.get("text")) > 0:
-        text = request.args.get("text")
+        text = bleach.clean(request.args.get("text"))
+        if not utils.is_calorie_text(text):
+            response = make_response(json.\
+                dumps('text invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         text = None
 
     if request.args.get("amnt") and \
         len(request.args.get("amnt")) > 0:
-        amnt = request.args.get("amnt")
+        amnt = bleach.clean(request.args.get("amnt"))
+        if not utils.is_calorie_amount(amnt):
+            response = make_response(json.\
+                dumps('amount invalid'), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     else:
         amnt = None 
 
@@ -693,9 +763,28 @@ def delete_calorie():
 
 # login/logout endpoints
 
+@ccapp.route('/gaccess', methods=['GET'])
+def gaccess():
+    """Get the URL string for initiating Google OAuth signin.
+    Navigate to the 
+
+    Args that can be sent as part of http query string:
+        calorie_id: the id of the calorie to delete
+    Return:
+        A JSON with one entry: {g_access_url: "the URL to enter to grant Calorie Counter permissions"}.
+    """
+    oauth_flow = oauth2client.client.OAuth2WebServerFlow(client_id='104598252187-0rbq64ac895hj3pkc0unepar2n1cf7j9.apps.googleusercontent.com',
+        client_secret='gEdnnUW4OpBS0QnP8-vHoSy6',
+        scope=["https://www.googleapis.com/auth/plus.me", "https://www.googleapis.com/auth/userinfo.email"],
+        redirect_uri="http://localhost:5000/gconnect",
+        access_type="offline", 
+        response_type="code")
+
+    return jsonify({"g_access_url": oauth_flow.step1_get_authorize_url()})
+
 @ccapp.route('/gconnect', methods=['POST'])
 def gconnect():
-    """Ajax endpoint for google sign in authentication
+    """Ajax endpoint for google sign in authentication.
     """
     # confirm entity with correct 3rd party credentials is same entity 
     # that is trying to login from the current login page's session.
@@ -735,7 +824,6 @@ def gconnect():
     if result.get('error') is not None:
         response = make_response(json.dumps(result.get('error')), 500)
         response.headers['Content-Type'] = 'application/json'
-
         return response
     
     # verify that the access token is used for the intended user
@@ -744,7 +832,6 @@ def gconnect():
         response = make_response(json.\
             dumps("Token's user ID doesn't match given user"), 401)
         response.headers['Content-Type'] = 'application/json'
-
         return response
     
     # verify that the access token is valid for this app
@@ -752,7 +839,6 @@ def gconnect():
         response = make_response(json.\
             dumps("Token's client ID doesn't match app's ID"), 401)
         response.headers['Content-Type'] = 'application/json'
-
         return response
         
     # check to see if the google account is already logged into the system
