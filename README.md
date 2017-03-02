@@ -1,6 +1,8 @@
 # Calorie Counter
 
-A single-page web application for tracking calorie intake. Create entries with a date, time, description, and number of calories. Filter viewing entries by date and time of day. Set a daily expected calorie count and view which days fall below and above that count.
+A single-page web application for tracking calorie intake. Backend RESTful API (Python Flask) supports any front-end. JavaScript (AngularJS) front-end is completely asynchronous. Users signin with Google OAuth2.
+
+Create entries with a date, time, description, and number of calories. Filter viewing entries by date and time of day. Set a daily expected calorie count and view which days fall below and above that count.
 
 Users can CRUD their own calories, managers can CRUD their own calories and other users (except Admins), and admins can CRUD everything.
 
