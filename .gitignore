@@ -5,3 +5,4 @@ MyNotes/
 client_secrets.json
 instance/
 .env
+venv/

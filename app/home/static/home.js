@@ -5,7 +5,6 @@ var ccapp = angular.module("ccapp", []);
 (function(){
     "use strict";
 
-    console.log("init angular home controller");
     // make jinja2 play with angular
     ccapp.config(function($interpolateProvider) {
         $interpolateProvider.startSymbol('//');
@@ -111,13 +110,7 @@ var ccapp = angular.module("ccapp", []);
             if (!$scope.curr_date_from || !$scope.curr_date_to) {
                 return true;
             }
-            console.log($scope.curr_date_from);
-            console.log($scope.curr_date_from.getFullYear() < $scope.curr_date_to.getFullYear());
-            console.log($scope.curr_date_from.getFullYear() == $scope.curr_date_to.getFullYear() &&
-                        $scope.curr_date_from.getMonth() < $scope.curr_date_to.getMonth());
-            console.log($scope.curr_date_from.getFullYear() == $scope.curr_date_to.getFullYear() &&
-                        $scope.curr_date_from.getMonth() == $scope.curr_date_to.getMonth() &&
-                        $scope.curr_date_from.getDate() <= $scope.curr_date_to.getDate());
+
             return ($scope.curr_date_from.getFullYear() < $scope.curr_date_to.getFullYear() || 
                     ($scope.curr_date_from.getFullYear() == $scope.curr_date_to.getFullYear() &&
                         $scope.curr_date_from.getMonth() < $scope.curr_date_to.getMonth()) ||
@@ -142,9 +135,6 @@ var ccapp = angular.module("ccapp", []);
 
         $scope.calIsInFilter = function(calorie) {
 
-            console.log(calorie);
-            console.log(calorie.date);
-            console.log(calorie.time);
             var date = calorie.date;
             var time = calorie.time;
 
@@ -242,17 +232,11 @@ var ccapp = angular.module("ccapp", []);
             $scope.curr_cal.old_date = isClear ? "" : data.old_date;
             $scope.curr_cal.old_date_meets = isClear ? "" : data.old_date_meets;
             $scope.curr_cal.old_date_daytotal = isClear ? "" : data.old_date_daytotal;
-            console.log("curr cal is");
-            console.log($scope.curr_cal);
         };
 
         // toggle the total calorie view on or off
         $scope.toggleViewCalories = function(isShow, userID) {
             if (isShow) {
-                console.log($scope.curr_user_dict);
-                console.log($scope.log_user);               
-                console.log(userID);
-                console.log($scope.curr_user_dict[parseInt(userID)]);
                 $scope.setCurrUserInfo(false, $scope.curr_user_dict[parseInt(userID)]);
                 $scope.viewingCalories = true;
             }
@@ -305,7 +289,6 @@ var ccapp = angular.module("ccapp", []);
 
         // set the information for the calorie to be posted
         $scope.setPostCalorie = function(isClear) {
-            console.log($scope.post_cal);
             $scope.post_cal.id = isClear ? "" : $scope.curr_cal.id;
             $scope.post_cal.user_id = isClear ? "" : $scope.curr_cal.user_id;
             $scope.post_cal.date_str = isClear ? "" : $scope.curr_cal.date_str;
@@ -319,7 +302,6 @@ var ccapp = angular.module("ccapp", []);
             $scope.post_cal.old_date = isClear ? "" : $scope.curr_cal.old_date;
             $scope.post_cal.old_date_meets = isClear ? "" : $scope.curr_cal.old_date_meets;
             $scope.post_cal.old_date_daytotal = isClear ? "" : $scope.curr_cal.old_date_daytotal;
-            console.log($scope.post_cal);
         };
 
         // initiate ajax call to post a calorie to server database
@@ -352,7 +334,6 @@ var ccapp = angular.module("ccapp", []);
                 }
             })
             .then(function(resp){
-                console.log(resp);
                 callback(resp.data["Data"]);
                 $scope.updateCalTotals($scope.curr_cal_dict[resp.data["Data"][0].id]);
                 $scope.addingCalorie = false;
@@ -383,9 +364,8 @@ var ccapp = angular.module("ccapp", []);
                 }
             })
             .then(function(resp){
-                console.log(resp);
-                $scope.updateCalTotals($scope.curr_cal_dict[resp.data["Data"][0].id]);
                 $scope.onEditSuccessful(resp.data["Data"], "calorie");
+                $scope.updateCalTotals($scope.curr_cal_dict[resp.data["Data"][0].id]);
                 window.alert("Successfully edited calorie");
             },function(error){
                 window.alert('There was an error editing the calorie on the server, check log');
@@ -406,8 +386,6 @@ var ccapp = angular.module("ccapp", []);
             }
             else {
                 $scope.editUserInCurr(data);
-                console.log("curr user dict is");
-                console.log($scope.curr_user_dict);
                 $scope.setCurrUserInfo(false, $scope.curr_user_dict[data[0].id]);
                 $scope.editingUser = false;
                 $scope.togglePostUser(false);
@@ -430,7 +408,6 @@ var ccapp = angular.module("ccapp", []);
                 }
             })
             .then(function(resp){
-                console.log(resp);
                 $scope.updateCalTotals($scope.curr_cal_dict[resp.data.id], "delete");
                 $scope.onDeleteSuccessful(resp.data);
                 window.alert("Successfully deleted calorie");
@@ -443,7 +420,6 @@ var ccapp = angular.module("ccapp", []);
         // update model/view on successful deletion from server
         $scope.onDeleteSuccessful = function(data) {
 
-            console.log(data);
             if (data.Model === "calorie") {
                 $scope.removeCalorieFromCurr(data.id);
                 $scope.addingCalorie = false;
@@ -471,7 +447,6 @@ var ccapp = angular.module("ccapp", []);
 
         $scope.editCalorieInCurr = function(data) {
 
-            console.log(data[0]);
             var cal = {
                 id: data[0].id,
                 user_id: data[0].user_id,
@@ -488,12 +463,8 @@ var ccapp = angular.module("ccapp", []);
                 old_date_daytotal: data[0].old_date_daytotal
             };
             
-            console.log("before edit");
-            console.log($scope.curr_cal_dict[data[0].id]);
             // replace with edited calorie
             $scope.curr_cal_dict[data[0].id] = cal;     
-            console.log("after edit");
-            console.log($scope.curr_cal_dict[data[0].id]);
         };
 
         // edit daytotal and passing status of current calories
@@ -510,11 +481,15 @@ var ccapp = angular.module("ccapp", []);
 
                 var calorie = $scope.curr_cal_dict[id];
 
-                console.log("old cal is");
+                console.log("cal in question is");
                 console.log(calorie);
                 if (!crudResult.user_id == calorie.user_id) continue;
+                if (crudResult.id == calorie.id) continue;
 
                 // if it was an edit, delete or add on this day
+                console.log(crudResult.date_str);
+                console.log(calorie.date_str);
+                console.log(crudResult.date_str === calorie.date_str);
                 if (crudResult.date_str === calorie.date_str) {
 
                     console.log("same date");
@@ -562,10 +537,6 @@ var ccapp = angular.module("ccapp", []);
         $scope.pushCalsFromServer = function(data) {
 
             for (var i = 0; i < data.length; i++) {
-                console.log("pushing:");
-                console.log(data[i]);
-
-                console.log(data[i]);
                 var cal = {
                     id: data[i].id,
                     user_id: data[i].user_id,
@@ -590,8 +561,6 @@ var ccapp = angular.module("ccapp", []);
         $scope.pushUsersFromServer = function(data) {
 
             for (var i = 0; i < data.length; i++) {
-                console.log("pushing:");
-                console.log(data[i]);
 
                 var user = {
                     id: data[i].id,
@@ -603,16 +572,10 @@ var ccapp = angular.module("ccapp", []);
  
                 $scope.curr_user_dict[user.id] = user;            
             }
-            console.log("curr user dict is");
-            console.log($scope.curr_user_dict);
         };
 
         // get list of calories from server, pass to callback
         $scope.getCalories = function(data, callback) {
-
-            // TO-DO:loading graphic
-
-            console.log(data);
 
             var calorie_id = data.hasOwnProperty("id") ? data.calorie_id : "";
             var user_id = data.hasOwnProperty("user_id") ? data.user_id : "";
@@ -629,10 +592,10 @@ var ccapp = angular.module("ccapp", []);
                 }
             })
             .then(function(resp){
-                console.log(resp);
                 callback(resp.data["Data"]);
             },function(error){
-                console.log('There was an error retrieving calories from the server: ' + error);
+                console.log('There was an error retrieving calories from the server');
+                console.log(error);
             });
         };
 
@@ -646,14 +609,12 @@ var ccapp = angular.module("ccapp", []);
             $scope.curr_user.email = isClear ? "" : data.email;
             $scope.curr_user.exp_cal_day = isClear ? "" : data.exp_cal_day;
 
-            console.log(isClear);
-            console.log(data);
+            console.log("setting current user info");
             if (isClear) {
                 $scope.expCalMessage = "";    
                 $scope.expIsSet = false;     
             }
             else if (data.exp_cal_day < 1) {
-                console.log("here")
                 $scope.expCalMessage = "No daily calorie goal set.";    
                 $scope.expIsSet = false;
             }
@@ -765,13 +726,7 @@ var ccapp = angular.module("ccapp", []);
             var user_type = $scope.canCRUDAll() ? $scope.post_user.user_type_id : "";
 
             var user_type_id = user_type.hasOwnProperty("id") ? user_type.id : user_type;
-
-            console.log($scope.post_user.user_type_id);
-            console.log(user_type_id);
-
             var exp_change = parseInt(exp_cal_day) == parseInt($scope.curr_user.exp_cal_day);
-            console.log("old" + parseInt($scope.curr_user.exp_cal_day));
-            console.log("new" + parseInt(exp_cal_day));
 
             $http({
                 method:'POST',
@@ -781,9 +736,9 @@ var ccapp = angular.module("ccapp", []);
                 }
             })
             .then(function(resp){
-                console.log(resp);
                 if (resp.data["Data"][0].exp_cal_day != $scope.curr_user.exp_cal_day) {
                     $scope.rescoreCals(resp.data["Data"][0]);
+
                 }
                 $scope.onEditSuccessful(resp.data["Data"], "user");
                 window.alert("Successfully edited user");
@@ -804,12 +759,8 @@ var ccapp = angular.module("ccapp", []);
                 user_type_id: data[0].user_type_id
             };
             
-            console.log("before edit");
-            console.log($scope.curr_user_dict[data[0].id]);
             // replace with edited calorie
             $scope.curr_user_dict[data[0].id] = user;     
-            console.log("after edit");
-            console.log($scope.curr_user_dict[data[0].id]);
         };
 
         // remove a user from the current model/view
@@ -840,8 +791,6 @@ var ccapp = angular.module("ccapp", []);
 
             var user_type_id = user_type.hasOwnProperty("id") ? user_type.id : user_type;
 
-            console.log(user_type_id);
-
             $http({
                 method:'POST',
                 url: "/add_user?username="+username+"&email="+email+"&exp_cal_day="+exp_cal_day+"&user_type_id="+user_type_id,
@@ -850,7 +799,6 @@ var ccapp = angular.module("ccapp", []);
                 }
             })
             .then(function(resp){
-                console.log(resp);
                 callback(resp.data["Data"]);
                 $scope.addingUser = false;
                 $scope.editingUser = false;
@@ -876,7 +824,6 @@ var ccapp = angular.module("ccapp", []);
                 }
             })
             .then(function(resp){
-                console.log(resp);
                 $scope.onDeleteSuccessful(resp.data);
                 window.alert("Successfully deleted user");
             },function(error){
@@ -887,8 +834,6 @@ var ccapp = angular.module("ccapp", []);
 
         // get list of users from server, pass to callback
         $scope.getUsers = function(data, callback) {
-
-            console.log(data);
 
             var user_id = data.hasOwnProperty("id") ? data.user_id : "";
             var email = data.hasOwnProperty("email") ? data.date_from : "";
@@ -902,10 +847,10 @@ var ccapp = angular.module("ccapp", []);
                 }
             })
             .then(function(resp){
-                console.log(resp);
                 callback(resp.data["Data"]);
             },function(error){
-                console.log('There was an error retrieving users from the server: ' + error);
+                console.log('There was an error retrieving users from the server');
+                console.log(error);
             });
         };
 
@@ -918,8 +863,6 @@ var ccapp = angular.module("ccapp", []);
             $scope.log_user.user_type_id = isClear ? "" : data.user_type_id;
             $scope.log_user.exp_cal_day = isClear ? "" : data.exp_cal_day;
             $scope.log_user.email = isClear ? "" : data.email;
-            console.log($scope.log_user.user_type_id);
-            console.log($scope.user_type_dict);
             // ensure logged in user is active
             $scope.pushUsersFromServer([$scope.log_user])
         };
@@ -930,9 +873,6 @@ var ccapp = angular.module("ccapp", []);
 
         // handle server OAuth ajax call with auth code from Google 
         $scope.signin = function(authResult) {
-            console.log("trying ajax from angular");
-
-            // TO-DO:loading graphic
 
             $http({
                 method:'POST',
@@ -943,14 +883,14 @@ var ccapp = angular.module("ccapp", []);
                 data: authResult['code']
             })
             .then(function(resp){
-                console.log(resp);
                 $scope.setLoggedInUserInfo(false, resp.data);
                 $scope.setCurrUserInfo(false, resp.data);
                 $scope.setTotalDataByUserType();
                 $scope.resetCalFilters();
             },function(error){
                 console.log(error);
-                console.log('There was an error: ' + authResult['error']);
+                console.log('There was an error on the server with signin');
+                console.log(authResult['error']);
             });
         };
 
@@ -965,7 +905,6 @@ var ccapp = angular.module("ccapp", []);
                 }
             })
             .then(function(resp){
-                console.log(resp);
                 $scope.setLoggedInUserInfo(true, resp);
                 $scope.setCurrUserInfo(true, resp.data);
                 $scope.toggleViewCalories(false);
@@ -988,11 +927,9 @@ var ccapp = angular.module("ccapp", []);
                 }
             })
             .then(function(resp){
-                console.log(resp.data);
                 for (var i = 0; i < resp.data["Data"].length; i++) {
                     $scope.user_type_dict[resp.data["Data"][i].id] = resp.data["Data"][i];
                 };
-                console.log($scope.user_type_dict);
             },function(error){
                 console.log('There was an error getting user permission types from server');
                 console.log(error);
@@ -1008,9 +945,6 @@ var ccapp = angular.module("ccapp", []);
 
 // callback when Google sends the user access code
 function signInCallback(authResult) {
-
-    console.log("called back");
-    console.log(authResult);
 
     if (authResult['code']) {
         angular.element(document.getElementById('homeCtrlDiv')).scope().signin(authResult);   

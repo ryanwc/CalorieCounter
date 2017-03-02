@@ -703,9 +703,9 @@ def edit_calorie():
         sCal = calorie.serialize
         sCal["daytotal"] = daytotal
         sCal["meets"] = meets
-        sCal["old_date"] = old_calorie.date if date_changed else False
-        sCal["old_date_meets"] = old_meets if date_changed else False
-        sCal["old_date_daytotal"] = old_daytotal if date_changed else False
+        sCal["old_date"] = old_calorie.date
+        sCal["old_date_meets"] = old_meets
+        sCal["old_date_daytotal"] = old_daytotal
         return jsonify(Data=[sCal])
     else:
         response = make_response(json.dumps('Internal server error'), 500)
