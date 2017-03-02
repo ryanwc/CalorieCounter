@@ -33,6 +33,18 @@ You must have valid login credentials to get any data from the API. So, it is re
 - Python Flask backend
 - AngularJS frontend 
 
+# Requirements
+
+bleach==1.4.3
+Flask==0.12
+Flask_Cors==3.0.2
+Flask_RESTful==0.3.5
+httplib2==0.9.2
+psycopg2==2.6.2
+requests==2.10.0
+SQLAlchemy==1.0.12
+google_api_python_client==1.6.2
+
 # License
 
 Created by Ryan William Connor in February 2017.  
