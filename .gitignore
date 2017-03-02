@@ -4,3 +4,4 @@ MyNotes/
 .idea/
 client_secrets.json
 instance/
+.env
