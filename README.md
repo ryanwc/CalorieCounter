@@ -17,7 +17,7 @@ The backend provides all data necessary to run the application through endpoints
 Example use of a JSON endpoint is as follows:
 
 1. Read the documentation for a specific endpoint to see which html query string parameters it accepts.
-2. Pass the required and desired parameters in the html query string with the appropriate http method. For example, the documentation for the '/edit_user' endpoint notes that the 'user_id' argument is required, while there are several optional parameters. So, a valid query string for this endpoint is '/edit_user?user_id=[some user id][&optional arguments]'
+2. For methods that only accept get requests, you must pass the required and desired parameters in the html query string with the appropriate http method. For example, the documentation for the '/edit_user' endpoint notes that the 'user_id' argument is required, while there are several optional parameters. So, a valid query string for this endpoint is '/edit_user?user_id=[some user id][&optional arguments]'. For methods that accept get or post requests, you can pass the arguments in a query string or in the content of the request.
 3. Do what you need to with the received JSON.
 
 The returned JSON will provide enough information to update any values cached on the client, so long as no other clients have changed server data values that correspond to the cached values.

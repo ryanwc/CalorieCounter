@@ -211,7 +211,8 @@ def get_calorie(calorie_id=None, user_id=None, user_type_id=None,
     session.close()
     return calorie
 
-def edit_user(user_id, username=None, email=None, exp_cal_day=None):
+def edit_user(user_id, username=None, email=None, exp_cal_day=None, 
+    user_type_id=None):
     """Edit a user.
     Pass none for an attribute to leave it unchanged.
 
@@ -220,6 +221,7 @@ def edit_user(user_id, username=None, email=None, exp_cal_day=None):
         username: the new username
         email: the new email address
         exp_cal_day: the new expected calorie count per day
+        user_type_id: the new user type id
     """
     session = get_calorie_db_session()
 
@@ -233,6 +235,9 @@ def edit_user(user_id, username=None, email=None, exp_cal_day=None):
     
     if exp_cal_day:
         user.exp_cal_day = exp_cal_day
+
+    if user_type_id:
+        user.user_type_id = user_type_id
 
     session.commit()
     session.close()

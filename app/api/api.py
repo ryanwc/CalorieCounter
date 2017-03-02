@@ -308,7 +308,7 @@ def edit_user():
         return response
 
     DataManager.edit_user(user_id=user_id, username=username, email=email, 
-        exp_cal_day=exp_cal_day)
+        exp_cal_day=exp_cal_day, user_type_id=user_type_id)
 
     user = DataManager.get_user(user_id=user_id)
 
