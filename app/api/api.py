@@ -20,7 +20,8 @@ CORS(ccapp)
 def get_user_type():
     """Endpoint for serving user type records from the database.
 
-    Args that can be sent as part of http query string:
+    Args can be sent as key/value pairs in the query string ('GET').
+    Args:
         None. This endpoint method will simply show which user types
         exist (and their properties)
     Return:
@@ -41,7 +42,7 @@ def get_user_type():
         return jsonify(Data=[])
 
 
-@ccapp.route('/add_user_type', methods=['POST'])
+@ccapp.route('/add_user_type', methods=['GET', 'POST'])
 def add_user_type():
     """Endpoint for adding user type records from the database.
     Currently unimplemented and unneeded. If user types need to be
@@ -50,7 +51,7 @@ def add_user_type():
     """
 
 
-@ccapp.route('/edit_user_type', methods=['POST'])
+@ccapp.route('/edit_user_type', methods=['GET', 'POST'])
 def edit_user_type():
     """Endpoint for editing user type records from the database.
     Currently unimplemented and unneeded. If user types need to be
@@ -58,7 +59,7 @@ def edit_user_type():
     connection to database.
     """
 
-@ccapp.route('/delete_user_type', methods=['POST'])
+@ccapp.route('/delete_user_type', methods=['GET', 'POST'])
 def delete_user_type():
     """Endpoint for deleting user type records from the database.
     Currently unimplemented and unneeded. If user types need to be
@@ -70,8 +71,9 @@ def delete_user_type():
 def get_user():
     """Endpoint for serving user records from the database.
 
+    Args can be sent as key/value pairs in the query string ('GET')
     Args are optional unless noted.
-    Args that can be sent as part of http query string:
+    Args:
         user_id: the id of the user to get
         email: the email of the user to get
         username: the username of the user to get
@@ -84,21 +86,21 @@ def get_user():
             dumps('Must sign in to CRUD'), 403)
         response.headers['Content-Type'] = 'application/json'
 
-    if request.args.get("user_id") and \
-        len(request.args.get("user_id")) > 0:
-        user_id = int(request.args.get("user_id"))
+    if request.values.get("user_id") and \
+        len(request.values.get("user_id")) > 0:
+        user_id = int(request.values.get("user_id"))
     else:
         user_id = None
 
-    if request.args.get("username") and \
-        len(request.args.get("username")) > 0:
-        username = request.args.get("username")
+    if request.values.get("username") and \
+        len(request.values.get("username")) > 0:
+        username = request.values.get("username")
     else:
         username = None
 
-    if request.args.get("email") and \
-        len(request.args.get("email")) > 0:
-        email = request.args.get("email")
+    if request.values.get("email") and \
+        len(request.values.get("email")) > 0:
+        email = request.values.get("email")
     else:
         email = None
 
@@ -123,12 +125,14 @@ def get_user():
         return jsonify(Data=[])
 
 
-@ccapp.route('/add_user', methods=['POST'])
+@ccapp.route('/add_user', methods=['GET', 'POST'])
 def add_user():
     """Endpoint for adding user records to the database.
 
+    Args can be sent as key/value pairs in the query string ('GET'), or as
+    key/value pairs in the content ('POST').
     Args are optional unless noted.
-    Args that can be sent as part of http query string:
+    Args:
         email: the email of the user (required)
         username: the username of the user (required)
         user_type_id: the type of user to add
@@ -142,9 +146,9 @@ def add_user():
             dumps('Must sign in to CRUD'), 400)
         response.headers['Content-Type'] = 'application/json'
 
-    if request.args.get("username") and \
-        len(request.args.get("username")) > 0:
-        username = bleach.clean(request.args.get("username"))
+    if request.values.get("username") and \
+        len(request.values.get("username")) > 0:
+        username = bleach.clean(request.values.get("username"))
         if not utils.is_username(username):
             response = make_response(json.\
                 dumps('username invalid'), 400)
@@ -153,9 +157,9 @@ def add_user():
     else:
         username = None
 
-    if request.args.get("email") and \
-        len(request.args.get("email")) > 0:
-        email = bleach.clean(request.args.get("email"))
+    if request.values.get("email") and \
+        len(request.values.get("email")) > 0:
+        email = bleach.clean(request.values.get("email"))
         if not utils.is_email(email):
             response = make_response(json.\
                 dumps('email invalid'), 400)
@@ -164,9 +168,9 @@ def add_user():
     else:
         email = None
 
-    if request.args.get("exp_cal_day") and \
-        len(request.args.get("exp_cal_day")) > 0:
-        exp_cal_day = int(bleach.clean(request.args.get("exp_cal_day")))
+    if request.values.get("exp_cal_day") and \
+        len(request.values.get("exp_cal_day")) > 0:
+        exp_cal_day = int(bleach.clean(request.values.get("exp_cal_day")))
         if not utils.is_exp_cal(exp_cal_day):
             response = make_response(json.\
                 dumps('exp_cal_day invalid'), 400)
@@ -175,9 +179,9 @@ def add_user():
     else:
         exp_cal_day = None 
 
-    if request.args.get("user_type_id") and \
-        len(request.args.get("user_type_id")) > 0:
-        user_type_id = int(bleach.clean(request.args.get("user_type_id")))
+    if request.values.get("user_type_id") and \
+        len(request.values.get("user_type_id")) > 0:
+        user_type_id = int(bleach.clean(request.values.get("user_type_id")))
         if not utils.is_user_type_id(user_type_id):
             response = make_response(json.\
                 dumps('user_type_id invalid'), 400)
@@ -212,12 +216,14 @@ def add_user():
         return response
 
 
-@ccapp.route('/edit_user', methods=['POST'])
+@ccapp.route('/edit_user', methods=['GET', 'POST'])
 def edit_user():
     """Endpoint for editing user records in the database.
 
+    Args can be sent as key/value pairs in the query string ('GET'), or as
+    key/value pairs in the content ('POST').
     Args are optional unless noted.
-    Args that can be sent as part of http query string:
+    Args:
         user_id: the id of the user to edit REQUIRED
         email: the new email
         username: the new username
@@ -231,17 +237,17 @@ def edit_user():
             dumps('Must sign in to CRUD'), 403)
         response.headers['Content-Type'] = 'application/json'
 
-    if request.args.get("user_id") and \
-        len(request.args.get("user_id")) > 0:
-        user_id = int(bleach.clean(request.args.get("user_id")))
+    if request.values.get("user_id") and \
+        len(request.values.get("user_id")) > 0:
+        user_id = int(bleach.clean(request.values.get("user_id")))
     else:
         response = make_response(json.dumps('Must provide user id'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response  
 
-    if request.args.get("username") and \
-        len(request.args.get("username")) > 0:
-        username = bleach.clean(request.args.get("username"))
+    if request.values.get("username") and \
+        len(request.values.get("username")) > 0:
+        username = bleach.clean(request.values.get("username"))
         if not utils.is_username(username):
             response = make_response(json.\
                 dumps('username invalid'), 400)
@@ -250,9 +256,9 @@ def edit_user():
     else:
         username = None    
 
-    if request.args.get("email") and \
-        len(request.args.get("email")) > 0:
-        email = bleach.clean(request.args.get("email"))
+    if request.values.get("email") and \
+        len(request.values.get("email")) > 0:
+        email = bleach.clean(request.values.get("email"))
         if not utils.is_email(email):
             response = make_response(json.\
                 dumps('email invalid'), 400)
@@ -261,9 +267,9 @@ def edit_user():
     else:
         email = None
 
-    if request.args.get("exp_cal_day") and \
-        len(request.args.get("exp_cal_day")) > 0:
-        exp_cal_day = int(bleach.clean(request.args.get("exp_cal_day")))
+    if request.values.get("exp_cal_day") and \
+        len(request.values.get("exp_cal_day")) > 0:
+        exp_cal_day = int(bleach.clean(request.values.get("exp_cal_day")))
         if not utils.is_exp_cal(exp_cal_day):
             response = make_response(json.\
                 dumps('exp_cal_day invalid'), 400)
@@ -272,9 +278,9 @@ def edit_user():
     else:
         exp_cal_day = None
 
-    if request.args.get("user_type_id") and \
-        len(request.args.get("user_type_id")) > 0:
-        user_type_id = int(bleach.clean(request.args.get("user_type_id")))
+    if request.values.get("user_type_id") and \
+        len(request.values.get("user_type_id")) > 0:
+        user_type_id = int(bleach.clean(request.values.get("user_type_id")))
         if not utils.is_user_type_id(user_type_id):
             response = make_response(json.\
                 dumps('user_type_id invalid'), 400)
@@ -313,11 +319,13 @@ def edit_user():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-@ccapp.route('/delete_user', methods=['POST'])
+@ccapp.route('/delete_user', methods=['GET', 'POST'])
 def delete_user():
     """Endpoint for deleting user records from the database.
 
-    Args that can be sent as part of http query string:
+    Args can be sent as key/value pairs in the query string ('GET'), or as
+    key/value pairs in the content ('POST').
+    Args:
         user_id: the id of the user to delete (REQUIRED)
     Return:
         A JSON representing deletion success or failure
@@ -327,10 +335,10 @@ def delete_user():
             dumps('Must sign in to CRUD'), 403)
         response.headers['Content-Type'] = 'application/json'
 
-    if request.args.get("user_id") and \
-        len(request.args.get("user_id")) > 0:
+    if request.values.get("user_id") and \
+        len(request.values.get("user_id")) > 0:
 
-        user_id = int(request.args.get("user_id"))
+        user_id = int(request.values.get("user_id"))
         user = DataManager.get_user(user_id=user_id)
 
         # check permissions
@@ -376,8 +384,9 @@ def delete_user():
 def get_calorie():
     """Endpoint for serving calorie records from the database.
 
-    All args are optional.
-    Args that can be sent as part of http query string:
+    Args can be sent as key/value pairs in the query string ('GET').
+    All args are optional. Providing no args returns all calories.
+    Args:
         calorie_id: the id of the calorie to get
         user_id: the user id of the calorie's owner
         date_from: the beginning date of the range of calories to get.
@@ -397,9 +406,9 @@ def get_calorie():
             dumps('Must sign in to CRUD'), 403)
         response.headers['Content-Type'] = 'application/json'
 
-    if request.args.get("calorie_id") and \
-        len(request.args.get("calorie_id")) > 0:
-        calorie_id = int(bleach.clean(request.args.get("calorie_id")))
+    if request.values.get("calorie_id") and \
+        len(request.values.get("calorie_id")) > 0:
+        calorie_id = int(bleach.clean(request.values.get("calorie_id")))
         # check permissions for reading this calorie
         calorie = DataManager.get_calorie(calorie_id=calorie_id)
         if not utils.canCalorieCRUD(calorie.user_id, 
@@ -411,9 +420,9 @@ def get_calorie():
     else:
         calorie_id = None
 
-    if request.args.get("user_id") and \
-        len(request.args.get("user_id")) > 0:
-        user_id = int(bleach.clean(request.args.get("user_id")))
+    if request.values.get("user_id") and \
+        len(request.values.get("user_id")) > 0:
+        user_id = int(bleach.clean(request.values.get("user_id")))
         # check perissions for reading this user's calories
         if not utils.canCalorieCRUD(user_id, 
                 login_session["user_id"], login_session["user_type_id"]):
@@ -424,29 +433,29 @@ def get_calorie():
     else:
         user_id = None    
 
-    if request.args.get("date_from") and \
-        len(request.args.get("date_from")) > 0:
-        dates = request.args.get(bleach.clean("date_from")).split("-")
+    if request.values.get("date_from") and \
+        len(request.values.get("date_from")) > 0:
+        dates = request.values.get(bleach.clean("date_from")).split("-")
         date_from = datetime.date(int(dates[0]), int(dates[1]), int(dates[2]))
     else:
         date_from = datetime.date.min
 
-    if request.args.get("date_to") and \
-        len(request.args.get("date_to")) > 0:
-        dates = request.args.get(bleach.clean("date_to")).split("-")
+    if request.values.get("date_to") and \
+        len(request.values.get("date_to")) > 0:
+        dates = request.values.get(bleach.clean("date_to")).split("-")
         date_to = datetime.date(int(dates[0]), int(dates[1]), int(dates[2]))
     else:
         date_to = datetime.date.max
 
-    if request.args.get("time_from") and \
-        len(request.args.get("time_from")) > 0:
-        time_from = datetime.time(int(request.args.get("time_from")))
+    if request.values.get("time_from") and \
+        len(request.values.get("time_from")) > 0:
+        time_from = datetime.time(int(request.values.get("time_from")))
     else:
         time_from = datetime.time.min
 
-    if request.args.get("time_to") and \
-        len(request.args.get("time_to")) > 0:
-        time_to = datetime.time(int(request.args.get("time_to")))
+    if request.values.get("time_to") and \
+        len(request.values.get("time_to")) > 0:
+        time_to = datetime.time(int(request.values.get("time_to")))
     else:
         time_to = datetime.time.max
 
@@ -483,12 +492,14 @@ def get_calorie():
         # no results, return empty list
         return jsonify(Data=[])
 
-@ccapp.route('/add_calorie', methods=['POST'])
+@ccapp.route('/add_calorie', methods=['GET', 'POST'])
 def add_calorie():
     """Endpoint for adding calorie records in the database.
 
+    Args can be sent as key/value pairs in the query string ('GET'), or as
+    key/value pairs in the content ('POST').
     All args are required.
-    Args that can be sent as part of http query string:
+    Args:
         user_id: the calorie's user id
         date: the calorie's date. must be given in 'YYYY-MM-DD' format
         time: the calorie's time. must be given as an hour, from 0 <= h <= 24
@@ -505,10 +516,10 @@ def add_calorie():
             dumps('Must sign in to CRUD'), 403)
         response.headers['Content-Type'] = 'application/json'
 
-    if request.args.get("user_id") and \
-        len(request.args.get("user_id")) > 0:
+    if request.values.get("user_id") and \
+        len(request.values.get("user_id")) > 0:
 
-        user_id = int(request.args.get("user_id"))
+        user_id = int(request.values.get("user_id"))
         if not utils.canCalorieCRUD(user_id, 
                 login_session["user_id"], login_session["user_type_id"]):
             response = make_response(json.\
@@ -520,9 +531,9 @@ def add_calorie():
         response.headers['Content-Type'] = 'application/json'
         return response  
 
-    if request.args.get("date") and \
-        len(request.args.get("date")) > 0:
-        dates = bleach.clean(request.args.get("date")).split("-")
+    if request.values.get("date") and \
+        len(request.values.get("date")) > 0:
+        dates = bleach.clean(request.values.get("date")).split("-")
         date = datetime.date(int(dates[0]), int(dates[1]), int(dates[2]))
         if not utils.is_calorie_date(date):
             response = make_response(json.\
@@ -534,9 +545,9 @@ def add_calorie():
         response.headers['Content-Type'] = 'application/json'
         return response  
 
-    if request.args.get("time") and \
-        len(request.args.get("time")) > 0:
-        time = datetime.time(int(request.args.get("time")))
+    if request.values.get("time") and \
+        len(request.values.get("time")) > 0:
+        time = datetime.time(int(request.values.get("time")))
         if not utils.is_calorie_time(time):
             response = make_response(json.\
                 dumps('time invalid'), 400)
@@ -547,9 +558,9 @@ def add_calorie():
         response.headers['Content-Type'] = 'application/json'
         return response  
 
-    if request.args.get("text") and \
-        len(request.args.get("text")) > 0:
-        text = bleach.clean(request.args.get("text"))
+    if request.values.get("text") and \
+        len(request.values.get("text")) > 0:
+        text = bleach.clean(request.values.get("text"))
         if not utils.is_calorie_text(text):
             response = make_response(json.dumps('text invalid'), 400)
             response.headers['Content-Type'] = 'application/json'
@@ -559,9 +570,9 @@ def add_calorie():
         response.headers['Content-Type'] = 'application/json'
         return response  
 
-    if request.args.get("amnt") and \
-        len(request.args.get("amnt")) > 0:
-        amnt = request.args.get("amnt")
+    if request.values.get("amnt") and \
+        len(request.values.get("amnt")) > 0:
+        amnt = request.values.get("amnt")
         if not utils.is_calorie_amount(amnt):
             response = make_response(json.dumps('amount invalid'), 400)
             response.headers['Content-Type'] = 'application/json'
@@ -590,12 +601,14 @@ def add_calorie():
         return response
 
 
-@ccapp.route('/edit_calorie', methods=['POST'])
+@ccapp.route('/edit_calorie', methods=['GET', 'POST'])
 def edit_calorie():
     """Endpoint for editing calorie records in the database.
 
+    Args can be sent as key/value pairs in the query string ('GET'), or as
+    key/value pairs in the content ('POST').
     Args are optional unless noted.
-    Args that can be sent as part of http query string:
+    Args:
         calorie_id: the id of the calorie to edit (REQUIRED)
         user_id: the new user id
         date: the new date. must be given in 'YYYY-MM-DD' format
@@ -613,23 +626,23 @@ def edit_calorie():
             dumps('Must sign in to CRUD'), 403)
         response.headers['Content-Type'] = 'application/json'
 
-    if request.args.get("calorie_id") and \
-        len(request.args.get("calorie_id")) > 0:
-        calorie_id = int(request.args.get("calorie_id"))
+    if request.values.get("calorie_id") and \
+        len(request.values.get("calorie_id")) > 0:
+        calorie_id = int(request.values.get("calorie_id"))
     else:
         response = make_response(json.dumps('Must provide calorie id'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response  
 
-    if request.args.get("user_id") and \
-        len(request.args.get("user_id")) > 0:
-        user_id = int(request.args.get("user_id"))
+    if request.values.get("user_id") and \
+        len(request.values.get("user_id")) > 0:
+        user_id = int(request.values.get("user_id"))
     else:
         user_id = None
 
-    if request.args.get("date") and \
-        len(request.args.get("date")) > 0:
-        dates = bleach.clean(request.args.get("date")).split("-")
+    if request.values.get("date") and \
+        len(request.values.get("date")) > 0:
+        dates = bleach.clean(request.values.get("date")).split("-")
         date = datetime.date(int(dates[0]), int(dates[1]), int(dates[2]))
         if not utils.is_calorie_date(date):
             response = make_response(json.\
@@ -639,9 +652,9 @@ def edit_calorie():
     else:
         date = None
 
-    if request.args.get("time") and \
-        len(request.args.get("time")) > 0:
-        time = datetime.time(int(bleach.clean(request.args.get("time"))))
+    if request.values.get("time") and \
+        len(request.values.get("time")) > 0:
+        time = datetime.time(int(bleach.clean(request.values.get("time"))))
         if not utils.is_calorie_time(time):
             response = make_response(json.\
                 dumps('time invalid'), 400)
@@ -650,9 +663,9 @@ def edit_calorie():
     else:
         time = None
 
-    if request.args.get("text") and \
-        len(request.args.get("text")) > 0:
-        text = bleach.clean(request.args.get("text"))
+    if request.values.get("text") and \
+        len(request.values.get("text")) > 0:
+        text = bleach.clean(request.values.get("text"))
         if not utils.is_calorie_text(text):
             response = make_response(json.\
                 dumps('text invalid'), 400)
@@ -661,9 +674,9 @@ def edit_calorie():
     else:
         text = None
 
-    if request.args.get("amnt") and \
-        len(request.args.get("amnt")) > 0:
-        amnt = bleach.clean(request.args.get("amnt"))
+    if request.values.get("amnt") and \
+        len(request.values.get("amnt")) > 0:
+        amnt = bleach.clean(request.values.get("amnt"))
         if not utils.is_calorie_amount(amnt):
             response = make_response(json.\
                 dumps('amount invalid'), 400)
@@ -713,11 +726,13 @@ def edit_calorie():
         return response
 
 
-@ccapp.route('/delete_calorie', methods=['POST'])
+@ccapp.route('/delete_calorie', methods=['GET', 'POST'])
 def delete_calorie():
     """Endpoint for deleting calorie records from the database.
 
-    Args that can be sent as part of http query string:
+    Args can be sent as key/value pairs in the query string ('GET'), or as
+    key/value pairs in the content ('POST').
+    Args:
         calorie_id: the id of the calorie to delete (REQUIRED)
     Return:
         A JSON representing deletion success or failure, with success
@@ -729,10 +744,10 @@ def delete_calorie():
             dumps('Must sign in to CRUD'), 403)
         response.headers['Content-Type'] = 'application/json'
 
-    if request.args.get("calorie_id") and \
-        len(request.args.get("calorie_id")) > 0:
+    if request.values.get("calorie_id") and \
+        len(request.values.get("calorie_id")) > 0:
 
-        calorie_id = int(request.args.get("calorie_id"))
+        calorie_id = int(request.values.get("calorie_id"))
         calorie = DataManager.get_calorie(calorie_id=calorie_id)
 
         # check permissions
@@ -777,11 +792,17 @@ def delete_calorie():
 def gconnect():
     """Ajax endpoint for google sign in authentication.
 
-    REQUIRED: Google authorization code to be sent as 'data' in the request.
+    If successful, sets the secure session cookie with the authenticated
+    user's information.
+
+    REQUIRED: Google authorization code to be sent as 'data' in 
+    the request content.
+    Returns:
+        A JSON with success or failure information.
     """
     # confirm entity with correct 3rd party credentials is same entity 
     # that is trying to login from the current login page's session.
-    if request.args.get('state') != login_session['state']:
+    if request.values.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter'), 
             401)
         response.headers['Content-Type'] = 'application/json'
